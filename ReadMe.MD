@@ -30,13 +30,13 @@ Have a look at our [Project Board](https://github.com/pratikthanki/NewBank/proje
 - We work fast and continously write production-ready code.
 - We merge to Master to reduce barriers of getting new features to users.
 - We aim to move tasks across the board without being assigned to too many work items.
-- We will fix tests we break.
+- We fix tests we break.
 - We have fun :) 
 
 **Best Practices**
 
 - We create one branch per issue/ work item
-- We include our initials and the featuee in our branch names (i.e. `initials/name-of-feature`)
+- We include our initials and the feature in our branch names (i.e. `initials/name-of-feature`)
 - We include useful commit messages that explain what we have done (no more than 50 characters).
 - A single commit should only really include a single logical change.
 - We handle large files using [Git Large File Storage](https://git-lfs.github.com/).
