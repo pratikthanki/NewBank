@@ -1,5 +1,7 @@
 **NewBank**
 
+![Build Master](https://github.com/pratikthanki/NewBank/workflows/Build%20Master/badge.svg?branch=master)
+
 NewBank is an idea for a new disrupter bank where customers can interact with their accounts via a simple command-line interface.
 
 
