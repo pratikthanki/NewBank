@@ -1,5 +1,7 @@
 
 # This workflow will run unit tests for this project
+# TODO send report to Code Coverage, currently there is an issue with this;
+# https://github.com/codecov/codecov-action/issues/43
 
 name: Unit Tests
 
@@ -28,11 +30,3 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Run tests with Maven
         run: mvn -B test --file pom.xml
-      - name: Code Coverage Report
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage/coverage-final.json
-          flags: pwa-e2e-cypress-tests
-          name: pwa-e2e-test-coverage
-          fail_ci_if_error: true

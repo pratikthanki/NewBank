@@ -1,4 +1,5 @@
-# This workflow will build a Java project with Maven
+
+# This workflow will compile a Java project with Maven
 
 name: Compile
 
