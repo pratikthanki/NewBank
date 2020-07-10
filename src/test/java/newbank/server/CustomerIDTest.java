@@ -1,7 +1,6 @@
 package newbank.server;
 
 import junit.framework.TestCase;
-import org.junit.Before;
 import org.junit.Test;
 
 public class CustomerIDTest extends TestCase {
