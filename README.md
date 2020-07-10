@@ -3,6 +3,7 @@
 ![Compile](https://github.com/pratikthanki/NewBank/workflows/Compile/badge.svg)
 ![Build](https://github.com/pratikthanki/NewBank/workflows/Build%20Master/badge.svg)
 ![Unit Tests](https://github.com/pratikthanki/NewBank/workflows/Unit%20Tests/badge.svg)
+[![codecov](https://codecov.io/gh/pratikthanki/NewBank/branch/master/graph/badge.svg?token=STPTR67RGK)](https://codecov.io/gh/pratikthanki/NewBank)
 
 NewBank is an idea for a new disrupter bank where customers can interact with their accounts via a simple 
 command-line interface.
