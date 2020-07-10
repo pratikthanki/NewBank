@@ -12,9 +12,7 @@ on:
 jobs:
   run:
     runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ubuntu-latest
+    name: Code Coverage
     steps:
       - name: Codecov
         uses: codecov/codecov-action@v1.0.10
