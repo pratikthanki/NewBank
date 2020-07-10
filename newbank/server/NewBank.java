@@ -1,6 +1,11 @@
 package newbank.server;
 
+import newbank.server.exception.InvalidInputException;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NewBank {
 	
@@ -41,9 +46,11 @@ public class NewBank {
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
 			switch(request) {
-			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
-				case "MOVE": return moveMoney(customer, request);
-			default : return "FAIL";
+				case "SHOWMYACCOUNTS" :
+					return showMyAccounts(customer);
+				case "MOVE":
+					return moveMoney(customer, request);
+				default : return "FAIL";
 			}
 		}
 		return "FAIL";
@@ -53,7 +60,56 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
-	private String moveMoney(CustomerID customerID, String request){
-		return null;
+	private String moveMoney(CustomerID customerID, String request) {
+		System.out.println("Hi");
+		String[] parsedInput = parseString(request);
+		Customer customer = customers.get(customerID.getKey());
+		List<Account> accountsAssociatedToCustomer = customer.getAccounts();
+		Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
+		for(Account a: accountsAssociatedToCustomer){
+			mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
+		}
+		if(parsedInput.length != 3){
+			System.out.println("You have not provided all the required values to transfer money between your accounts. " +
+					"Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
+			return "FAIL";
+		}
+
+		//Get amount
+		Double amount = Double.valueOf(parsedInput[0]);
+
+		//Get the 'from' account
+		Account from = null;
+		if(mapOfAccountNamesToAccounts.get(parsedInput[1]) != null){
+			from = mapOfAccountNamesToAccounts.get(parsedInput[1]);
+		} else {
+			System.out.println("Provided 'from' account does not exist, please check your input and try again.");
+			return "FAIL";
+		}
+
+
+		//Get the 'to' account
+		Account to = null;
+		if(mapOfAccountNamesToAccounts.get(parsedInput[2]) != null){
+			to = mapOfAccountNamesToAccounts.get(parsedInput[2]);
+		} else {
+			System.out.println("Provided 'to' account does not exist, please check your input and try again.");
+			return "FAIL";
+		}
+
+		if(from.getOpeningBalance() < amount){
+			System.out.println("This action is invalid, as this account does not have a sufficient balance.");
+			return "FAIL";
+		} else {
+			from.setOpeningBalance(from.getOpeningBalance() - amount);
+			to.setOpeningBalance(to.getOpeningBalance() + amount);
+			System.out.println("From Account:" + from.toString());
+			System.out.println("To Account:" + to.toString());
+			return "SUCCESS";
+		}
+	}
+
+	private String[] parseString(String inputString){
+		return inputString.split(" ");
 	}
 }
