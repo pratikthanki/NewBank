@@ -1,8 +1,10 @@
 **NewBank**
 
 ![Build Master](https://github.com/pratikthanki/NewBank/workflows/Build%20Master/badge.svg?branch=master)
+![Unit Tests](https://github.com/pratikthanki/NewBank/workflows/Unit%20Tests/badge.svg?branch=master)
 
-NewBank is an idea for a new disrupter bank where customers can interact with their accounts via a simple command-line interface.
+NewBank is an idea for a new disrupter bank where customers can interact with their accounts via a simple 
+command-line interface.
 
 
 **Goals**
@@ -19,7 +21,8 @@ accounts
 
 - User can enter a 'Username' and 'Password'.
 - If the username matches to one of the test records, the user is authenticated and logged in.
-- The user can then specify what they wish to do. At present, the only available option is SHOWMYACCOUNTS, which displays all accounts associated to that user and the current balance.
+- The user can then specify what they wish to do. At present, the only available option is SHOWMYACCOUNTS, which 
+displays all accounts associated to that user and the current balance.
 
 
 **Future Functionality**
