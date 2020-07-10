@@ -42,6 +42,7 @@ public class NewBank {
 		if(customers.containsKey(customer.getKey())) {
 			switch(request) {
 			case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
+				case "MOVE": return moveMoney(customer, request);
 			default : return "FAIL";
 			}
 		}
@@ -52,4 +53,7 @@ public class NewBank {
 		return (customers.get(customer.getKey())).accountsToString();
 	}
 
+	private String moveMoney(CustomerID customerID, String request){
+		return null;
+	}
 }
