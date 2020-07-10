@@ -10,8 +10,8 @@ on:
     branches: [ master ]
 
 jobs:
-  run:
-    runs-on: ${{ matrix.os }}
+  code_cov:
+    runs-on: ubuntu-latest
     name: Code Coverage
     steps:
       - name: Codecov
