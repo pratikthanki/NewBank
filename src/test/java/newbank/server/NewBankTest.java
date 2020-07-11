@@ -3,14 +3,18 @@ package newbank.server;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
 import static org.junit.Assert.*;
 
 public class NewBankTest {
     NewBank newBank;
     CustomerID customerID;
+    CustomerID bhagy = new CustomerID("Bhagy");
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         newBank = NewBank.getBank();
         customerID = new CustomerID("John");
     }
@@ -48,7 +52,33 @@ public class NewBankTest {
 
     @Test
     public void processRequestSuccess() {
-        String expected = "Checking: 250.0";
-        assertEquals(expected, newBank.processRequest(customerID, "SHOWMYACCOUNTS"));
+        String expected = "Main: 1000.0";
+        assertEquals(expected, newBank.processRequest(bhagy, "SHOWMYACCOUNTS"));
+    }
+
+    @Test
+    public void moveMoneyBetweenAccountsSuccess(){
+        String result = newBank.processRequest(customerID, "MOVE 50 Checking Savings");
+
+        assertEquals("SUCCESS", result);
+    }
+
+    @Test
+    public void moveMoneyBetweenAccountsFailed(){
+        String missingArgument = newBank.processRequest(customerID, "MOVE 100 Checking");
+
+        assertEquals("FAIL", missingArgument);
+
+        String invalidAmount = newBank.processRequest(customerID, "MOVE 1000 Checking Savings");
+
+        assertEquals("FAIL", invalidAmount);
+
+        String invalidFromAccount = newBank.processRequest(customerID, "MOVE 50 Check Savings");
+
+        assertEquals("FAIL", invalidFromAccount);
+
+        String invalidToAccount = newBank.processRequest(customerID, "MOVE 50 Checking Save");
+
+        assertEquals("FAIL", invalidToAccount);
     }
 }
