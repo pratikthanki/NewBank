@@ -9,15 +9,9 @@ import java.net.ServerSocket;
 import static org.junit.Assert.*;
 
 public class NewBankTest {
-    NewBank newBank;
-    CustomerID customerID;
+    NewBank newBank = NewBank.getBank();
+    CustomerID customerID = new CustomerID("John");
     CustomerID bhagy = new CustomerID("Bhagy");
-
-    @Before
-    public void setUp() throws IOException {
-        newBank = NewBank.getBank();
-        customerID = new CustomerID("John");
-    }
 
     @Test
     public void getBank() {
