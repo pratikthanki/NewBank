@@ -1,8 +1,5 @@
 package newbank.server;
 
-import newbank.server.exception.InvalidInputException;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +25,7 @@ public class NewBank {
 		
 		Customer john = new Customer();
 		john.addAccount(new Account("Checking", 250.0));
+		john.addAccount(new Account("Savings", 50.0));
 		customers.put("John", john);
 	}
 	
@@ -45,12 +43,13 @@ public class NewBank {
 	// commands from the NewBank customer are processed in this method
 	public synchronized String processRequest(CustomerID customer, String request) {
 		if(customers.containsKey(customer.getKey())) {
-			switch(request) {
+			switch(request.split(" ")[0]) {
 				case "SHOWMYACCOUNTS" :
 					return showMyAccounts(customer);
 				case "MOVE":
 					return moveMoney(customer, request);
-				default : return "FAIL";
+				default:
+					return "FAIL";
 			}
 		}
 		return "FAIL";
@@ -61,7 +60,6 @@ public class NewBank {
 	}
 
 	private String moveMoney(CustomerID customerID, String request) {
-		System.out.println("Hi");
 		String[] parsedInput = parseString(request);
 		Customer customer = customers.get(customerID.getKey());
 		List<Account> accountsAssociatedToCustomer = customer.getAccounts();
@@ -69,29 +67,28 @@ public class NewBank {
 		for(Account a: accountsAssociatedToCustomer){
 			mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
 		}
-		if(parsedInput.length != 3){
+		if(parsedInput.length != 4){
 			System.out.println("You have not provided all the required values to transfer money between your accounts. " +
 					"Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
 			return "FAIL";
 		}
 
 		//Get amount
-		Double amount = Double.valueOf(parsedInput[0]);
+		Double amount = Double.valueOf(parsedInput[1]);
 
 		//Get the 'from' account
 		Account from = null;
-		if(mapOfAccountNamesToAccounts.get(parsedInput[1]) != null){
-			from = mapOfAccountNamesToAccounts.get(parsedInput[1]);
+		if(mapOfAccountNamesToAccounts.get(parsedInput[2]) != null){
+			from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
 		} else {
 			System.out.println("Provided 'from' account does not exist, please check your input and try again.");
 			return "FAIL";
 		}
 
-
 		//Get the 'to' account
 		Account to = null;
-		if(mapOfAccountNamesToAccounts.get(parsedInput[2]) != null){
-			to = mapOfAccountNamesToAccounts.get(parsedInput[2]);
+		if(mapOfAccountNamesToAccounts.get(parsedInput[3]) != null){
+			to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
 		} else {
 			System.out.println("Provided 'to' account does not exist, please check your input and try again.");
 			return "FAIL";
