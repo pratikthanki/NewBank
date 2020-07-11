@@ -1,10 +1,6 @@
 package newbank.server;
 
-import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.net.ServerSocket;
 
 import static org.junit.Assert.*;
 

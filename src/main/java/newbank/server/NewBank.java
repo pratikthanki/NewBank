@@ -43,7 +43,7 @@ public class NewBank {
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customer, String request) {
         if(customers.containsKey(customer.getKey())) {
-            switch(request.split(" ")[0]) {
+            switch(parseString(request)[0]) {
                 case "SHOWMYACCOUNTS" :
                     return showMyAccounts(customer);
                 case "MOVE":
@@ -77,19 +77,15 @@ public class NewBank {
         Double amount = Double.valueOf(parsedInput[1]);
 
         //Get the 'from' account
-        Account from = null;
-        if(mapOfAccountNamesToAccounts.get(parsedInput[2]) != null){
-            from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
-        } else {
+        Account from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
+        if(from == null){
             System.out.println("Provided 'from' account does not exist, please check your input and try again.");
             return "FAIL";
         }
 
         //Get the 'to' account
-        Account to = null;
-        if(mapOfAccountNamesToAccounts.get(parsedInput[3]) != null){
-            to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
-        } else {
+        Account to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
+        if(to == null){
             System.out.println("Provided 'to' account does not exist, please check your input and try again.");
             return "FAIL";
         }
