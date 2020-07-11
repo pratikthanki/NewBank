@@ -44,7 +44,7 @@ public class NewBank {
                 case "SHOWMYACCOUNTS":
                     return showMyAccounts(customer);
                 case "NEWACCOUNT":
-                    return handleCreateNewAccount(customer, request);
+                    return createNewAccount(customer, request);
                 default:
                     return "FAIL";
             }
@@ -52,18 +52,14 @@ public class NewBank {
         return "FAIL";
     }
 
-    private String handleCreateNewAccount(CustomerID customer, String request) {
+    private String createNewAccount(CustomerID customer, String request) {
         String[] requestAndDetails = request.split(" ");
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
-            return createNewAcountAndDisplay(customer, newAccountName);
+            customers.get(customer.getKey()).addAccount(new Account(newAccountName, 0.0));
+            return "SUCCESS";
         }
         return "FAIL";
-    }
-
-    private String createNewAcountAndDisplay(CustomerID customerID, String newAccountName) {
-        customers.get(customerID.getKey()).addAccount(new Account(newAccountName, 0.0));
-        return "SUCCESS";
     }
 
     private String showMyAccounts(CustomerID customer) {
