@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class NewBankClientHandler extends Thread{
 
@@ -33,21 +34,40 @@ public class NewBankClientHandler extends Thread{
             CustomerID customer = bank.checkLogInDetails(userName, password);
             // if the user is authenticated then get requests from the user and process them
             if(customer != null) {
-                out.println("Log In Successful. What do you want to do?");
-                while(true) {
-                    String request = in.readLine();
-                    System.out.println("Request from " + customer.getKey());
-                    String responce = bank.processRequest(customer, request);
-                    out.println(responce);
+                String[] menuOptions = {"Show my accounts", "New Account", "Move", "Pay"};
+                String[] requests = {"SHOWMYACCOUNTS", "NEWACCOUNT", "MOVE", "PAY"};
+                out.println("Log In Successful. Please choose one of the following options:");
+                for( int i = 0; i < menuOptions.length; i++)
+                {
+                    String item = menuOptions[i];
+                    out.println(i + ".\t" + item);
                 }
+                out.println("9.\tQuit");
+                // handle user commands
+                String menuItem;
+                do {
+                    out.println("\nPlease select a new option:");
+                    menuItem = in.readLine();
+                    switch (menuItem) {
+                        case "0":
+                            out.println("Request from " + customer.getKey());
+                            String response = bank.processRequest(customer, requests[0]);
+                            out.println(response);
+                            break;
+                        case "9":
+                            out.println("Bye-bye!");
+                            break;
+                        default:
+                            out.println("Invalid choice.");
+                    }
+                } while (!menuItem.equals("9"));
             }
             else {
                 out.println("Log In Failed");
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 in.close();
                 out.close();
