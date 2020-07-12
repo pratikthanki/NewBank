@@ -71,4 +71,19 @@ public class NewBankTest {
 
         assertEquals("FAIL", invalidToAccount);
     }
+
+    @Test
+    public void createNewAccount(){
+        String newAccountName = "Savings";
+        String expectedResult = "SUCCESS";
+
+        assertEquals(expectedResult, newBank.processRequest(customerID, "NEWACCOUNT "+newAccountName));
+        assertTrue(newBank.processRequest(customerID, "SHOWMYACCOUNTS").contains(newAccountName+": 0.0"));
+
+    }
+
+    @Test
+    public void createNewAccountWithoutAccountName(){
+        assertEquals("FAIL", newBank.processRequest(customerID, "NEWACCOUNT"));
+    }
 }
