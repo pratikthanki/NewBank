@@ -1,10 +1,13 @@
 package newbank.server;
 
+import org.graalvm.compiler.lir.StandardOp;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.*;
 
 public class NewBankClientHandler extends Thread {
 
@@ -21,7 +24,7 @@ public class NewBankClientHandler extends Thread {
     public void run() {
         // keep getting requests from the client and processing them
         try {
-            // ask for user name
+            //ask for user name
             out.println("Enter Username");
             String userName = in .readLine();
             // ask for password
@@ -32,58 +35,58 @@ public class NewBankClientHandler extends Thread {
             CustomerID customer = bank.checkLogInDetails(userName, password);
             // if the user is authenticated then get requests from the user and process them
             if (customer != null) {
-                out.println("Log In Successful. Please choose one of the following options:");
+                out.println("Log In Successful. Please choose one of the following options using :");
+
+                //Menu options and requests
+                HashMap < String, String > menuOptions = new HashMap < > ();
+                menuOptions.put("1", "SHOWMYACCOUNTS");
+                menuOptions.put("2", "NEWACCOUNT");
+                menuOptions.put("3", "MOVE");
+                menuOptions.put("4", "PAY");
+
                 //print all menu options
-                processMenuSelection();
+                processMenuSelection(menuOptions);
+
                 // handle user commands
-                handleUserCommands(in,customer);
+                handleUserCommands( in , customer, menuOptions);
+
             } else {
                 out.println("Log In Failed");
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                in .close();
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Thread.currentThread().interrupt();
-            }
         }
+        //         finally {
+        //            try {
+        //                in.close();
+        //                out.close();
+        //            } catch (IOException e) {
+        //                e.printStackTrace();
+        //                Thread.currentThread().interrupt();
+        //            }
+        //        }
     }
 
-    private void processMenuSelection(){
-        String[] menuOptions= {
-                "Show my accounts",
-                "New Account",
-                "Move",
-                "Pay"
-        };
-
-        for (int i = 0; i < menuOptions.length; i++) {
-            String item = menuOptions[i];
-            out.println(i + ".\t" + item);
+    private void processMenuSelection(HashMap < String, String > hashMap) {
+        // Print values
+        int count = 0;
+        for (String key: hashMap.values()) {
+            count++;
+            out.println(count + ".\t" + key);
         }
         out.println("9.\tQuit");
     }
 
-    private void handleUserCommands(BufferedReader in, CustomerID customer) throws IOException {
+    private void handleUserCommands(BufferedReader in , CustomerID customer, HashMap < String, String > hashMap) throws IOException {
         String menuItem;
-        String[] requests = {
-                "SHOWMYACCOUNTS",
-                "NEWACCOUNT",
-                "MOVE",
-                "PAY"
-        };
-
         do {
             out.println("\nPlease select a new option:");
-            menuItem = in.readLine();
+            menuItem = in .readLine();
+
             switch (menuItem) {
-                case "0":
+                case "1":
                     out.println("Request from " + customer.getKey());
-                    String response = bank.processRequest(customer, requests[0]);
+                    String response = bank.processRequest(customer, hashMap.get("1"));
                     out.println(response);
                     break;
                 case "9":
