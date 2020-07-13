@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class NewBank {
 
     private static final NewBank bank = new NewBank();
-    private HashMap<String,Customer> customers;
+    private HashMap<String, Customer> customers;
 
     private NewBank() {
         customers = new HashMap<>();
@@ -31,7 +31,7 @@ public class NewBank {
     }
 
     public synchronized CustomerID checkLogInDetails(String userName, String password) {
-        if(customers.containsKey(userName)) {
+        if (customers.containsKey(userName)) {
             return new CustomerID(userName);
         }
         return null;
@@ -39,11 +39,25 @@ public class NewBank {
 
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customer, String request) {
-        if(customers.containsKey(customer.getKey())) {
-            switch(request) {
-                case "SHOWMYACCOUNTS" : return showMyAccounts(customer);
-                default : return "FAIL";
+        if (customers.containsKey(customer.getKey())) {
+            switch (request.split(" ")[0]) {
+                case "SHOWMYACCOUNTS":
+                    return showMyAccounts(customer);
+                case "NEWACCOUNT":
+                    return createNewAccount(customer, request);
+                default:
+                    return "FAIL";
             }
+        }
+        return "FAIL";
+    }
+
+    private String createNewAccount(CustomerID customer, String request) {
+        String[] requestAndDetails = request.split(" ");
+        if (requestAndDetails.length == 2) {
+            String newAccountName = requestAndDetails[1];
+            customers.get(customer.getKey()).addAccount(new Account(newAccountName, 0.0));
+            return "SUCCESS";
         }
         return "FAIL";
     }
