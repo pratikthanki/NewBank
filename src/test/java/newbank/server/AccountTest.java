@@ -23,4 +23,18 @@ public class AccountTest extends TestCase {
         accountName = new Account("savings", 123);
         assertEquals("savings: 123.0", accountName.toString());
     }
+
+    @Test
+    public void testGetAndSetAccountNameAndOpeningBalance(){
+        accountName = new Account("Checking", 123);
+
+        assertEquals("Checking", accountName.getAccountName());
+        assertEquals(123.0, accountName.getOpeningBalance());
+
+        accountName.setOpeningBalance(234.0);
+        accountName.setAccountName("Savings");
+
+        assertEquals("Savings", accountName.getAccountName());
+        assertEquals(234.0, accountName.getOpeningBalance());
+    }
 }

@@ -10,6 +10,10 @@ public class Customer {
         accounts = new ArrayList<>();
     }
 
+    public ArrayList<Account> getAccounts(){
+        return accounts;
+    }
+
     public String accountsToString() {
         String s = "";
         for(Account a : accounts) {
