@@ -98,15 +98,14 @@ public class NewBankClientHandler extends Thread {
                     break;
                 case "3":
                     out.println("Request from " + customer.getKey());
-                    out.println("Please enter the amount you would like to move:");
+                    out.println("Please follow the instructions below to complete your MOVE. You need to enter the amount, outgoing and receiving account.\nPlease enter the amount you would like to move:");
                     String amount = in .readLine();
-                    out.println("Please enter the outgoing account");
+                    out.println("Please enter the outgoing account's name");
                     String from= in .readLine();
-                    out.println("Please enter the receiving account");
+                    out.println("Please enter the receiving account's name");
                     String to = in .readLine();
                     String response3 = bank.processRequest(customer,hashMap.get("3") + " " + amount + " " + from + " " + to );
                     out.println(response3);
-                    out.println(customer);
                     break;
                 case "9":
                     out.println("Bye-bye!");
