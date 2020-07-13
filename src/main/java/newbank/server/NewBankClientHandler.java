@@ -89,6 +89,25 @@ public class NewBankClientHandler extends Thread {
                     String response = bank.processRequest(customer, hashMap.get("1"));
                     out.println(response);
                     break;
+                case "2":
+                    out.println("Request from " + customer.getKey());
+                    out.println("Please enter the new account's name:");
+                    String newAccountName = in .readLine();
+                    String response2 = bank.processRequest(customer,hashMap.get("2") + " " + newAccountName);
+                    out.println(response2);
+                    break;
+                case "3":
+                    out.println("Request from " + customer.getKey());
+                    out.println("Please enter the amount you would like to move:");
+                    String amount = in .readLine();
+                    out.println("Please enter the outgoing account");
+                    String from= in .readLine();
+                    out.println("Please enter the receiving account");
+                    String to = in .readLine();
+                    String response3 = bank.processRequest(customer,hashMap.get("3") + " " + amount + " " + from + " " + to );
+                    out.println(response3);
+                    out.println(customer);
+                    break;
                 case "9":
                     out.println("Bye-bye!");
                     break;
