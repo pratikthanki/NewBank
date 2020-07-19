@@ -103,12 +103,12 @@ public class NewBank {
         }
 
         //Check if the 'from' account has sufficient balance for the money move
-        if(from.getOpeningBalance() < amount){
+        if(from.getBalance() < amount){
             System.out.println("This action is invalid, as this account does not have a sufficient balance.");
             return "FAIL";
         } else {
-            from.setOpeningBalance(from.getOpeningBalance() - amount);
-            to.setOpeningBalance(to.getOpeningBalance() + amount);
+            from.withdrawMoney(amount);
+            to.addMoney(amount);
             System.out.println("From Account:" + from.toString());
             System.out.println("To Account:" + to.toString());
             return "SUCCESS";
