@@ -29,12 +29,16 @@ public class AccountTest extends TestCase {
         accountName = new Account("Checking", 123);
 
         assertEquals("Checking", accountName.getAccountName());
-        assertEquals(123.0, accountName.getOpeningBalance());
+        assertEquals(123.0, accountName.getBalance());
 
-        accountName.setOpeningBalance(234.0);
+        accountName.addMoney(10.0);
         accountName.setAccountName("Savings");
 
         assertEquals("Savings", accountName.getAccountName());
-        assertEquals(234.0, accountName.getOpeningBalance());
+        assertEquals(133.0, accountName.getBalance());
+
+        accountName.withdrawMoney(100.0);
+
+        assertEquals(33.0, accountName.getBalance());
     }
 }
