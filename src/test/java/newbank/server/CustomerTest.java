@@ -43,6 +43,6 @@ public class CustomerTest extends TestCase {
 
         assertEquals(1, accountList.size());
         assertEquals("savings", accountList.get(0).getAccountName());
-        assertEquals(123.0, accountList.get(0).getOpeningBalance());
+        assertEquals(123.0, accountList.get(0).getBalance());
     }
 }
