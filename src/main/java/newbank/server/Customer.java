@@ -11,20 +11,19 @@ public class Customer {
     private String name;
     private String address;
     private CustomerID customerID;
-    
-
-    public String getCustomerID() {
-		return customerID.getKey();
-	}
 
 	public Customer() {
         accounts = new ArrayList<>();
     }
-    
+
 	//Constructor 2: Create customer while providing CustomerID
     public Customer(CustomerID customerID) {
     	this(); //Customer()
         this.customerID = customerID;
+    }
+
+    public String getCustomerID() {
+        return customerID.getKey();
     }
 
     public ArrayList<Account> getAccounts(){
@@ -41,8 +40,9 @@ public class Customer {
 
     public void addAccount(Account account) {
         accounts.add(account);
+        account.setDefaultAccount(this);
     }
-    
+
     public Date getDob() {
 		return this.dob;
 	}
@@ -78,22 +78,22 @@ public class Customer {
 		this.address = address;
 		return true;
 	}
-	
+
 	public String getDetail() {
 		StringBuffer buffer = new StringBuffer();
-		
+
 		buffer.append("Customer Name: \t" + getName() + "\n");
 		buffer.append("Date of Birth: \t" + getDob() + "\n");
 		buffer.append("Email Address: \t" + getEmail() + "\n");
 		buffer.append("Address: \t" + getAddress() + "\n");
-		
+
 		return buffer.toString();
 	}
-	
+
 	public boolean updateDetail(String name, Date dob, String email, String address) {
-		if (setName(name) && setEmail(email) && setDob(dob) && setAddress(address) ) 
+		if (setName(name) && setEmail(email) && setDob(dob) && setAddress(address) )
 			return true;
-		
+
 		return false;
 	}
 }
