@@ -115,6 +115,51 @@ public class NewBank {
         }
     }
 
+    private String payMoney(CustomerID customer, CustomerID customer1, String request){
+        String[] parsedInput = parseString(request);
+        Customer payee = customers.get(customer.getKey());
+        Customer payer = customers.get(customer1.getKey());
+        List<Account> accountsAssociatedToCustomer = payer.getAccounts();
+        Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
+        for(Account a: accountsAssociatedToCustomer){
+            mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
+        }
+        if(parsedInput.length != 4){
+            System.out.println("You have not provided all the required values to transfer money between your accounts. " +
+                    "Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
+            return "FAIL";
+        }
+
+        //Get amount
+        Double amount = Double.valueOf(parsedInput[1]);
+
+        //Get the 'from' account
+        Account from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
+        if(from == null){
+            System.out.println("Provided 'from' account does not exist, please check your input and try again.");
+            return "FAIL";
+        }
+
+        //Get the 'to' account
+        Account to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
+        if(to == null){
+            System.out.println("Provided 'to' account does not exist, please check your input and try again.");
+            return "FAIL";
+        }
+
+        //Check if the 'from' account has sufficient balance for the money move
+        if(from.getOpeningBalance() < amount){
+            System.out.println("This action is invalid, as this account does not have a sufficient balance.");
+            return "FAIL";
+        } else {
+            from.setOpeningBalance(from.getOpeningBalance() - amount);
+            to.setOpeningBalance(to.getOpeningBalance() + amount);
+            System.out.println("From Account:" + from.toString());
+            System.out.println("To Account:" + to.toString());
+            return "SUCCESS";
+        }
+    }
+
     private String[] parseString(String inputString){
         return inputString.split(" ");
     }
