@@ -7,7 +7,9 @@ import org.junit.Test;
 
 import java.util.List;
 
-public class CustomerTest extends TestCase {
+import static org.junit.Assert.*;
+
+public class CustomerTest {
     Account accountName;
     Customer customerName;
 
@@ -15,25 +17,25 @@ public class CustomerTest extends TestCase {
     public void setUp() {
         accountName = new Account("savings", 123);
         customerName = new Customer();
-        customerName.addAccount(accountName);
+        customerName.addAccount(accountName, true);
     }
 
     @Test
     public void testAccountsToString() {
-        Assert.assertEquals("savings: 123.0", customerName.accountsToString());
+        assertEquals("savings: 123.0", customerName.accountsToString());
     }
 
     @Test
     public void testAddAccount() {
         try {
             Account isa = new Account("isa", 123);
-            customerName.addAccount(isa);
+            customerName.addAccount(isa, true);
 
-            Assert.assertTrue(true);
-            Assert.assertNotNull(customerName);
+            assertTrue(true);
+            assertNotNull(customerName);
         }
         catch(Exception e) {
-            Assert.fail();
+            fail();
         }
     }
 
@@ -43,6 +45,6 @@ public class CustomerTest extends TestCase {
 
         assertEquals(1, accountList.size());
         assertEquals("savings", accountList.get(0).getAccountName());
-        assertEquals(123.0, accountList.get(0).getBalance());
+        assertEquals(123.0, accountList.get(0).getBalance(),0);
     }
 }

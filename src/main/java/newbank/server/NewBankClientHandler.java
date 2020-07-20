@@ -15,7 +15,8 @@ public class NewBankClientHandler extends Thread {
 
 
     public NewBankClientHandler(Socket s) throws IOException {
-        bank = NewBank.getBank(); in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        bank = NewBank.getBank();
+        in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
     }
 
@@ -42,9 +43,6 @@ public class NewBankClientHandler extends Thread {
                 menuOptions.put("3", "MOVE");
                 menuOptions.put("4", "PAY");
 
-                //print all menu options
-                processMenuSelection(menuOptions);
-
                 // handle user commands
                 handleUserCommands( in , customer, menuOptions);
 
@@ -54,15 +52,15 @@ public class NewBankClientHandler extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //         finally {
-        //            try {
-        //                in.close();
-        //                out.close();
-        //            } catch (IOException e) {
-        //                e.printStackTrace();
-        //                Thread.currentThread().interrupt();
-        //            }
-        //        }
+                 finally {
+                    try {
+                        in.close();
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                    }
+                }
     }
 
     private void processMenuSelection(HashMap < String, String > hashMap) {
@@ -78,9 +76,9 @@ public class NewBankClientHandler extends Thread {
     private void handleUserCommands(BufferedReader in , CustomerID customer, HashMap < String, String > hashMap) throws IOException {
         String menuItem;
         do {
-            out.println("\nPlease select a new option:");
+            processMenuSelection(hashMap);
+            out.println("\nPlease select an option:");
             menuItem = in .readLine();
-
             switch (menuItem) {
                 case "1":
                     out.println("Request from " + customer.getKey());
@@ -96,7 +94,7 @@ public class NewBankClientHandler extends Thread {
                     break;
                 case "3":
                     out.println("Request from " + customer.getKey());
-                    out.println("Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
+                    out.println("Please enter amount:");
                     String amount = in .readLine();
                     out.println("Please enter the FromAccount's name:");
                     String from= in .readLine();
@@ -104,6 +102,17 @@ public class NewBankClientHandler extends Thread {
                     String to = in .readLine();
                     String response3 = bank.processRequest(customer,hashMap.get("3") + " " + amount + " " + from + " " + to );
                     out.println(response3);
+                    break;
+                case "4":
+                    out.println("Request from " + customer.getKey());
+                    out.println("Please enter the Recipient name:");
+                    String to1= in .readLine();
+                    out.println("Please enter amount:");
+                    String amount1 = in .readLine();
+                    out.println("Please enter the FromAccount's name:");
+                    String from1 = in .readLine();
+                    String response4 = bank.processRequest(customer,hashMap.get("4") + " " + to1 + " " + amount1 + " " + from1 );
+                    out.println(response4);
                     break;
                 case "9":
                     out.println("Bye-bye!");
