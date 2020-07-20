@@ -1,5 +1,6 @@
 package newbank.server;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -83,7 +84,7 @@ public class Customer {
 		StringBuffer buffer = new StringBuffer();
 		
 		buffer.append("Customer Name: \t" + getName() + "\n");
-		buffer.append("Date of Birth: \t" + getDob() + "\n");
+		buffer.append("Date of Birth: \t" + DateFormat.getDateInstance().format(getDob()) + "\n");
 		buffer.append("Email Address: \t" + getEmail() + "\n");
 		buffer.append("Address: \t" + getAddress() + "\n");
 		
