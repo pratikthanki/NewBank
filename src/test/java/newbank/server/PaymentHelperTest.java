@@ -10,21 +10,23 @@ public class PaymentHelperTest {
     Account account;
     Account account1;
     NewBank newBank;
-    PaymentHelper paymentHelper;
+    IPaymentHelper paymentHelper;
 
     @Before
     public void SetUp() {
         newBank = NewBank.getBank();
-        paymentHelper = new PaymentHelper();
+        paymentHelper = new IPaymentHelper();
     }
 
     @Test
     public void testGetDefaultAccount(){
         Customer john = new Customer();
-        john.addAccount(new Account(AccountsData.checking, 250.0), false);
-        john.addAccount(new Account(AccountsData.savings, 50.0), true);
-        john.addAccount(new Account(AccountsData.isa, 50.0), false);
-        assertEquals(john.getAccounts().get(1), paymentHelper.getDefaultAccount(john));
+        john.addAccount(new Account(AccountsData.checking, 250.0));
+        john.addAccount(new Account(AccountsData.savings, 50.0));
+        john.addAccount(new Account(AccountsData.isa, 50.0));
+        assertEquals(john.getAccounts().get(0), john.getDefaultAccount());
+        assertEquals(false, john.getAccounts().get(1).isDefaultAccount());
+        assertEquals(false, john.getAccounts().get(2).isDefaultAccount());
     }
 
     @Test

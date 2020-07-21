@@ -13,7 +13,6 @@ public class NewBankClientHandler extends Thread {
     private final BufferedReader in ;
     private final PrintWriter out;
 
-
     public NewBankClientHandler(Socket s) throws IOException {
         bank = NewBank.getBank();
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -23,7 +22,7 @@ public class NewBankClientHandler extends Thread {
     public void run() {
         // keep getting requests from the client and processing them
         try {
-            //ask for user name
+           // ask for user name
             out.println("Enter Username");
             String userName = in .readLine();
             // ask for password
@@ -45,15 +44,15 @@ public class NewBankClientHandler extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //         finally {
-        //            try {
-        //                in.close();
-        //                out.close();
-        //            } catch (IOException e) {
-        //                e.printStackTrace();
-        //                Thread.currentThread().interrupt();
-        //            }
-        //        }
+//                 finally {
+//                    try {
+//                        in.close();
+//                        out.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                        Thread.currentThread().interrupt();
+//                    }
+//                }
     }
 
     private void processMenuSelection(HashMap < String, String > hashMap) {
@@ -77,7 +76,7 @@ public class NewBankClientHandler extends Thread {
         return menuOptions;
     }
 
-    private void handleUserCommands(BufferedReader in , CustomerID customer) throws IOException {
+    private void handleUserCommands(BufferedReader in , CustomerID customerID) throws IOException {
         String menuItem;
         do {
             processMenuSelection(getMainMenu());
@@ -85,44 +84,44 @@ public class NewBankClientHandler extends Thread {
             menuItem = in .readLine();
             switch (menuItem) {
                 case "1":
-                    out.println("Request from " + customer.getKey());
-                    String response = bank.processRequest(customer, getMainMenu().get("1"));
+                    out.println("Request from " + customerID.getKey());
+                    String response = bank.processRequest(customerID, getMainMenu().get("1"));
                     out.println(response);
                     break;
                 case "2":
-                    out.println("Request from " + customer.getKey());
+                    out.println("Request from " + customerID.getKey());
                     out.println("Please enter the new account's name:");
                     String newAccountName = in .readLine();
-                    String response2 = bank.processRequest(customer,getMainMenu().get("2") + " " + newAccountName);
+                    String response2 = bank.processRequest(customerID, getMainMenu().get("2") + " " + newAccountName);
                     out.println(response2);
                     break;
                 case "3":
-                    out.println("Request from " + customer.getKey());
+                    out.println("Request from " + customerID.getKey());
                     out.println("Please enter amount:");
                     String amount = in .readLine();
                     out.println("Please enter the FromAccount's name:");
                     String from= in .readLine();
                     out.println("Please enter the ToAccount's name:");
                     String to = in .readLine();
-                    String response3 = bank.processRequest(customer,getMainMenu().get("3") + " " + amount + " " + from + " " + to );
+                    String response3 = bank.processRequest(customerID,getMainMenu().get("3") + " " + amount + " " + from + " " + to );
                     out.println(response3);
                     break;
                 case "4":
-                    out.println("Request from " + customer.getKey());
+                    out.println("Request from " + customerID.getKey());
                     out.println("Please enter the Recipient name:");
                     String to1= in .readLine();
                     out.println("Please enter amount:");
                     String amount1 = in .readLine();
                     out.println("Please enter the FromAccount's name:");
                     String from1 = in .readLine();
-                    String response4 = bank.processRequest(customer,getMainMenu().get("4") + " " + to1 + " " + amount1 + " " + from1 );
+                    String response4 = bank.processRequest(customerID,getMainMenu().get("4") + " " + to1 + " " + amount1 + " " + from1 );
                     out.println(response4);
                     break;
                 case "5":
                 	out.println("Retrieving customer detail...");
                     out.println("CUSTOMER DETAIL");
                     out.println("----------------------");
-                    out.println(bank.processRequest(customer, getMainMenu().get("5")));
+                    out.println(bank.processRequest(customerID, getMainMenu().get("5")));
                     out.println("----------------------");
                     out.println("Done.");
 
