@@ -4,12 +4,12 @@ public class Account {
 
     private String accountName;
     private double balance;
-    private boolean defaultAccount;
+    private boolean defaultAccountStatus;
 
     public Account(String accountName, double openingBalance) {
         this.accountName = accountName;
         this.balance = openingBalance;
-        this.defaultAccount = false;
+        this.defaultAccountStatus = false;
     }
 
     public String getAccountName() {
@@ -21,11 +21,12 @@ public class Account {
     }
 
     public Boolean isDefaultAccount() {
-        return defaultAccount;
+        return defaultAccountStatus;
     }
 
-    public void setDefaultAccount(Boolean defaultAccount) {
-        this.defaultAccount = defaultAccount;
+    public void setDefaultAccount(Customer customer) {
+        int count = customer.getNumberOfAccounts();
+        defaultAccountStatus= count <= 1;
     }
 
     public void addMoney(double money){

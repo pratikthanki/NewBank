@@ -2,9 +2,14 @@ package newbank.server;
 
 import java.util.HashMap;
 
-public interface PaymentInterface {
+public interface IPayment {
+
+    //checks if customer exists
     Boolean checkCustomerExists(HashMap<String, Customer > map, String customer);
-    Boolean checkAccountExists(Account account, Customer customer);
+
+    //calculates the transaction
     Boolean calculateTransaction(Account from, Account to, Double amount);
+
+    //check if amount is a numerical value
     Boolean isNumeric(String strNum);
 }

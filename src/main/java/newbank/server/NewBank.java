@@ -7,7 +7,7 @@ import java.util.Map;
 public class NewBank {
 
     private static final NewBank bank = new NewBank();
-    private static final PaymentHelper paymentHelper = new PaymentHelper();
+    private final IPaymentHelper paymentHelper = new IPaymentHelper();
     private final HashMap<String,Customer> customers;
 
     private NewBank() {
@@ -17,16 +17,16 @@ public class NewBank {
 
     private void addTestData() {
         Customer bhagy = new Customer();
-        bhagy.addAccount(new Account("Main", 1000.0), true);
+        bhagy.addAccount(new Account("Main", 1000.0));
         customers.put("Bhagy", bhagy);
 
         Customer christina = new Customer();
-        christina.addAccount(new Account("Savings", 1500.0), true);
+        christina.addAccount(new Account("Savings", 1500.0));
         customers.put("Christina", christina);
 
         Customer john = new Customer();
-        john.addAccount(new Account("Checking", 250.0), true);
-        john.addAccount(new Account("Savings", 50.0), false);
+        john.addAccount(new Account("Checking", 250.0));
+        john.addAccount(new Account("Savings", 50.0));
         customers.put("John", john);
 
     }
@@ -43,17 +43,17 @@ public class NewBank {
     }
 
     // commands from the NewBank customer are processed in this method
-    public synchronized String processRequest(CustomerID customer, String request) {
-        if (customers.containsKey(customer.getKey())) {
+    public synchronized String processRequest(CustomerID customerID, String request) {
+        if (customers.containsKey(customerID.getKey())) {
             switch (parseString(request)[0]) {
                 case "SHOWMYACCOUNTS":
-                    return showMyAccounts(customer);
+                    return showMyAccounts(customerID);
                 case "NEWACCOUNT":
-                    return createNewAccount(customer, request);
+                    return createNewAccount(customerID,request);
                 case "MOVE":
-                    return moveMoney(customer, request);
+                    return moveMoney(customerID, request);
                 case "PAY":
-                    return payMoney(customer, request);
+                    return payMoney(customerID, request);
                 default:
                     return "FAIL";
             }
@@ -61,11 +61,11 @@ public class NewBank {
         return "FAIL";
     }
 
-    private String createNewAccount(CustomerID customer, String request) {
+    private String createNewAccount(CustomerID customerID, String request) {
         String[] requestAndDetails = request.split(" ");
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
-            customers.get(customer.getKey()).addAccount(new Account(newAccountName, 0.0), false);
+            customers.get(customerID.getKey()).addAccount(new Account(newAccountName, 0.0) );
             return "SUCCESS";
         }
         return "FAIL";
@@ -145,16 +145,16 @@ public class NewBank {
         Double amount = Double.valueOf(strAmount);
 
         //Get the 'from' account
-        Account from = paymentHelper.getHasMapForAllCustomerAccounts(payer).get(parsedInput[3]);
+        Account from = payer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
 
         //Get the 'to' account
         if (!paymentHelper.checkCustomerExists(customers, payeeCustomerName)) {
             return "FAIL";
         }
-        Account to = paymentHelper.getDefaultAccount(payee);
+        Account to = payee.getDefaultAccount();
 
         //check if accounts exist and if the 'payerAccount' account has sufficient balance for the money move
-        if (paymentHelper.checkAccountExists(from, payer) || paymentHelper.checkAccountExists(to, payer)){
+        if (payer.checkAccountExists(from) || payee.checkAccountExists(to)){
          return "FAIL";
         }
 
@@ -163,7 +163,6 @@ public class NewBank {
             return "FAIL";
         }
         else{return "SUCCESS";}
-
     }
 
     private String[] parseString(String inputString){
