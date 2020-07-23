@@ -15,7 +15,8 @@ public class NewBankClientHandler extends Thread {
 
 
     public NewBankClientHandler(Socket s) throws IOException {
-        bank = NewBank.getBank(); in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        bank = NewBank.getBank(); 
+        in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
     }
 
@@ -41,6 +42,7 @@ public class NewBankClientHandler extends Thread {
                 menuOptions.put("2", "NEWACCOUNT");
                 menuOptions.put("3", "MOVE");
                 menuOptions.put("4", "PAY");
+                menuOptions.put("5", "CUSTOMERDETAIL");
 
                 //print all menu options
                 processMenuSelection(menuOptions);
@@ -104,6 +106,15 @@ public class NewBankClientHandler extends Thread {
                     String to = in .readLine();
                     String response3 = bank.processRequest(customer,hashMap.get("3") + " " + amount + " " + from + " " + to );
                     out.println(response3);
+                    break;
+                case "5":
+                	out.println("Retrieving customer detail...");
+                    out.println("CUSTOMER DETAIL");
+                    out.println("----------------------");
+                    out.println(bank.processRequest(customer, hashMap.get("5")));
+                    out.println("----------------------");
+                    out.println("Done.");
+                    
                     break;
                 case "9":
                     out.println("Bye-bye!");

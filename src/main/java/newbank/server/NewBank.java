@@ -1,5 +1,8 @@
 package newbank.server;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +20,18 @@ public class NewBank {
     private void addTestData() {
         Customer bhagy = new Customer();
         bhagy.addAccount(new Account("Main", 1000.0));
+        bhagy.updateDetail("Baby Hagy", new GregorianCalendar(1982, Calendar.DECEMBER, 20).getTime(), "bhagy@bath.ac.uk", "Bath, London");
         customers.put("Bhagy", bhagy);
-
+        
         Customer christina = new Customer();
         christina.addAccount(new Account("Savings", 1500.0));
+        christina.updateDetail("Christina Aguilera", new GregorianCalendar(1985, Calendar.JANUARY, 11).getTime(), "christina.aguilera@celebrity.com", "Houston, USA");
         customers.put("Christina", christina);
 
         Customer john = new Customer();
         john.addAccount(new Account("Checking", 250.0));
         john.addAccount(new Account("Savings", 50.0));
+        john.updateDetail("John Doe", new Date(), "john.doe@newbank.com", "Lagos, Nigeria");
         customers.put("John", john);
     }
 
@@ -50,6 +56,8 @@ public class NewBank {
                     return createNewAccount(customer, request);
                 case "MOVE":
                     return moveMoney(customer, request);
+                case "CUSTOMERDETAIL":
+                    return getCustomer(customer, request).getDetail();
                 default:
                     return "FAIL";
             }
@@ -57,7 +65,14 @@ public class NewBank {
         return "FAIL";
     }
 
-    private String createNewAccount(CustomerID customer, String request) {
+    private Customer getCustomer(CustomerID customer, String request) {
+		if (request=="CUSTOMERDETAIL") {
+			return customers.get(customer.getKey());
+		}
+		return null;
+	}
+
+	private String createNewAccount(CustomerID customer, String request) {
         String[] requestAndDetails = request.split(" ");
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
