@@ -20,18 +20,30 @@ public class NewBank {
     private void addTestData() {
         Customer bhagy = new Customer();
         bhagy.addAccount(new Account("Main", 1000.0));
-        bhagy.updateDetail("Baby Hagy", new GregorianCalendar(1982, Calendar.DECEMBER, 20).getTime(), "bhagy@bath.ac.uk", "Bath, London");
+        bhagy.setName("Baby Hagy");
+        bhagy.setDob(new GregorianCalendar(1982, Calendar.DECEMBER, 20).getTime());
+        bhagy.setEmail("bhagy@bath.ac.uk");
+        bhagy.setAddress("Bath, London");
+   
         customers.put("Bhagy", bhagy);
         
         Customer christina = new Customer();
         christina.addAccount(new Account("Savings", 1500.0));
-        christina.updateDetail("Christina Aguilera", new GregorianCalendar(1985, Calendar.JANUARY, 11).getTime(), "christina.aguilera@celebrity.com", "Houston, USA");
+        christina.setName("Christina Aguilera");
+        christina.setDob(new GregorianCalendar(1985, Calendar.JANUARY, 11).getTime());
+        christina.setEmail("christina.aguilera@celebrity.com");
+        christina.setAddress("Houston, USA");
+        
         customers.put("Christina", christina);
 
         Customer john = new Customer();
         john.addAccount(new Account("Checking", 250.0));
         john.addAccount(new Account("Savings", 50.0));
-        john.updateDetail("John Doe", new Date(), "john.doe@newbank.com", "Lagos, Nigeria");
+        john.setName("John Doe");
+        john.setDob(new Date());
+        john.setEmail("john.doe@newbank.com");
+        john.setAddress("Lagos, Nigeria");
+        
         customers.put("John", john);
     }
 

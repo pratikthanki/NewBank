@@ -1,7 +1,6 @@
 package newbank.server;
 
-import org.graalvm.compiler.lir.StandardOp;
-
+//import org.graalvm.compiler.lir.StandardOp;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,7 +13,6 @@ public class NewBankClientHandler extends Thread {
     private NewBank bank;
     private BufferedReader in ;
     private PrintWriter out;
-
 
     public NewBankClientHandler(Socket s) throws IOException {
         bank = NewBank.getBank(); 
@@ -58,15 +56,15 @@ public class NewBankClientHandler extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //         finally {
-        //            try {
-        //                in.close();
-        //                out.close();
-        //            } catch (IOException e) {
-        //                e.printStackTrace();
-        //                Thread.currentThread().interrupt();
-        //            }
-        //        }
+                 finally {
+                    try {
+                        in.close();
+                        out.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                    }
+                }
     }
 
     private void processMenuSelection(HashMap < String, String > hashMap) {
@@ -115,8 +113,7 @@ public class NewBankClientHandler extends Thread {
                     out.println("----------------------");
                     out.println(bank.processRequest(customer, hashMap.get("5")));
                     out.println("----------------------");
-                    out.println("Done.");
-                    
+                    out.println("Done.");    
                     break;
                 case "9":
                     out.println("Bye-bye!");

@@ -11,21 +11,26 @@ public class Customer {
     private String name;
     private String address;
     private CustomerID customerID;
-    
-
-    public String getCustomerID() {
-		return customerID.getKey();
-	}
 
 	public Customer() {
         accounts = new ArrayList<>();
     }
     
 	//Constructor 2: Create customer while providing CustomerID
-    public Customer(CustomerID customerID) {
-    	this(); //Customer()
-        this.customerID = customerID;
+	/*
+	 * public Customer(CustomerID customerID) { this(); //Customer() this.customerID
+	 * = customerID; }
+	 */
+    
+    public Customer(String firstname, String surname) {
+    	this(); 
+        this.customerID = new CustomerID(firstname);
+        this.name = firstname + " " + surname;
     }
+    
+    public String getCustomerID() {
+		return customerID.getKey();
+	}
 
     public ArrayList<Account> getAccounts(){
         return accounts;
@@ -90,10 +95,4 @@ public class Customer {
 		return buffer.toString();
 	}
 	
-	public boolean updateDetail(String name, Date dob, String email, String address) {
-		if (setName(name) && setEmail(email) && setDob(dob) && setAddress(address) ) 
-			return true;
-		
-		return false;
-	}
 }
