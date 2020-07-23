@@ -1,10 +1,14 @@
 package newbank.server;
 
+//import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+//import java.util.Locale;
 import java.util.Map;
 
 public class NewBank {
@@ -70,6 +74,22 @@ public class NewBank {
                     return moveMoney(customer, request);
                 case "CUSTOMERDETAIL":
                     return getCustomer(customer, request).getDetail();
+                case "GETCUSTOMEREMAIL":
+                    return getCustomer(customer, request).getEmail();
+                case "GETCUSTOMERADDRESS":
+                    return getCustomer(customer, request).getAddress();
+                case "GETCUSTOMERNAME":
+                    return getCustomer(customer, request).getName();
+                case "GETCUSTOMERDOB":
+                    return String.format("%1$tb %1$te, %1$tY",getCustomer(customer, request).getDob());
+                case "UPDATECUSTOMEREMAIL":
+                    return updateCustomerEmail(customer, request);
+                case "UPDATECUSTOMERADDRESS":
+                    return updateCustomerAddress(customer, request);
+                case "UPDATECUSTOMERNAME":
+                    return updateCustomerName(customer, request);
+                case "UPDATECUSTOMERDOB":
+                    return updateCustomerDob(customer, request);
                 default:
                     return "FAIL";
             }
@@ -78,10 +98,60 @@ public class NewBank {
     }
 
     private Customer getCustomer(CustomerID customer, String request) {
-		if (request=="CUSTOMERDETAIL") {
+		if (customer.getKey() != null) {
 			return customers.get(customer.getKey());
 		}
 		return null;
+	}
+    
+    private String updateCustomerEmail(CustomerID customer, String request) {
+    	 String[] requestAndDetails = request.split(" ");
+         if (requestAndDetails.length == 2) {
+             String newEmail = requestAndDetails[1];
+             customers.get(customer.getKey()).setEmail(newEmail); 
+             return "SUCCESS";
+         }
+         return "FAIL";
+	}
+    
+    private String updateCustomerAddress(CustomerID customer, String request) {
+    	String newAddress = request.substring(request.indexOf(" ")+1, request.length());
+        
+        if (newAddress.length() > 0) {
+        	customers.get(customer.getKey()).setAddress(newAddress); 
+            return "SUCCESS";
+        }
+            
+        return "FAIL";
+	}
+    
+    private String updateCustomerName(CustomerID customer, String request) {
+    	String newName = request.substring(request.indexOf(" ")+1, request.length());
+   
+        if (newName.length() > 0) {
+            customers.get(customer.getKey()).setName(newName); 
+            return "SUCCESS";
+        }
+        return "FAIL";
+	}
+    
+    private String updateCustomerDob(CustomerID customer, String request) {
+    	String dob = request.substring(request.indexOf(" ")+1, request.length());
+    	
+        if (dob.length() == 0) return "FAIL";
+        
+		try {
+			SimpleDateFormat parser = new SimpleDateFormat("d MM yyyy");
+			
+            Date d;
+			d = parser.parse(dob);
+			customers.get(customer.getKey()).setDob(d); 
+            return "SUCCESS";
+            
+		} catch (ParseException e) {
+			return "Error: " + e.getMessage();
+		}
+        
 	}
 
 	private String createNewAccount(CustomerID customer, String request) {
