@@ -18,21 +18,22 @@ public class DatabaseClient {
 
     private HashMap<String, Customer> addTestData() {
         HashMap<String, Customer> customers = new HashMap<>();
+        String password = "MyPa55w0rd";
 
         Customer bhagy = new Customer();
-        bhagy.setPassword("MyPa55w0rd");
+        bhagy.setPassword(password);
         bhagy.addAccount(new Account("Main", 1000.0, 1234));
         bhagy.updateDetail("Baby Hagy", new GregorianCalendar(1982, Calendar.DECEMBER, 20).getTime(), "bhagy@bath.ac.uk", "Bath, London");
         customers.put("Bhagy", bhagy);
 
         Customer christina = new Customer();
-        christina.setPassword("MyPa55w0rd");
+        christina.setPassword(password);
         christina.addAccount(new Account("Savings", 1500.0, 2580));
         christina.updateDetail("Christina Aguilera", new GregorianCalendar(1985, Calendar.JANUARY, 11).getTime(), "christina.aguilera@celebrity.com", "Houston, USA");
         customers.put("Christina", christina);
 
         Customer john = new Customer();
-        john.setPassword("MyPa55w0rd");
+        john.setPassword(password);
         john.addAccount(new Account("Checking", 250.0, 9876));
         john.addAccount(new Account("Savings", 50.0, 3490));
         john.updateDetail("John Doe", new Date(), "john.doe@newbank.com", "Lagos, Nigeria");
