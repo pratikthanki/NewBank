@@ -129,5 +129,4 @@ public class NewBankClientHandler extends Thread {
             }
         } while (!menuItem.equals("9"));
     }
-
 }
