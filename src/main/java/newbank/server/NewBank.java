@@ -1,5 +1,10 @@
 package newbank.server;
 
+import newbank.database.DatabaseClient;
+import newbank.server.authentication.BasicAuthenticator;
+
+import javax.xml.crypto.Data;
+import java.net.Authenticator;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -10,29 +15,12 @@ import java.util.Map;
 public class NewBank {
 
     private static final NewBank bank = new NewBank();
-    private HashMap<String,Customer> customers;
+    private DatabaseClient databaseClient = new DatabaseClient();
+    private HashMap<String, Customer> customers;
+    private BasicAuthenticator basicAuthenticator;
 
     private NewBank() {
-        customers = new HashMap<>();
-        addTestData();
-    }
-
-    private void addTestData() {
-        Customer bhagy = new Customer();
-        bhagy.addAccount(new Account("Main", 1000.0));
-        bhagy.updateDetail("Baby Hagy", new GregorianCalendar(1982, Calendar.DECEMBER, 20).getTime(), "bhagy@bath.ac.uk", "Bath, London");
-        customers.put("Bhagy", bhagy);
-        
-        Customer christina = new Customer();
-        christina.addAccount(new Account("Savings", 1500.0));
-        christina.updateDetail("Christina Aguilera", new GregorianCalendar(1985, Calendar.JANUARY, 11).getTime(), "christina.aguilera@celebrity.com", "Houston, USA");
-        customers.put("Christina", christina);
-
-        Customer john = new Customer();
-        john.addAccount(new Account("Checking", 250.0));
-        john.addAccount(new Account("Savings", 50.0));
-        john.updateDetail("John Doe", new Date(), "john.doe@newbank.com", "Lagos, Nigeria");
-        customers.put("John", john);
+        customers = databaseClient.getCustomers();
     }
 
     public static NewBank getBank() {
@@ -40,10 +28,9 @@ public class NewBank {
     }
 
     public synchronized CustomerID checkLogInDetails(String userName, String password) {
-        if(customers.containsKey(userName)) {
-            return new CustomerID(userName);
-        }
-        return null;
+        basicAuthenticator = new BasicAuthenticator(userName, password);
+
+        return basicAuthenticator.ValidateLogin();
     }
 
     // commands from the NewBank customer are processed in this method
@@ -66,17 +53,17 @@ public class NewBank {
     }
 
     private Customer getCustomer(CustomerID customer, String request) {
-		if (request=="CUSTOMERDETAIL") {
-			return customers.get(customer.getKey());
-		}
-		return null;
-	}
+        if (request == "CUSTOMERDETAIL") {
+            return customers.get(customer.getKey());
+        }
+        return null;
+    }
 
-	private String createNewAccount(CustomerID customer, String request) {
+    private String createNewAccount(CustomerID customer, String request) {
         String[] requestAndDetails = request.split(" ");
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
-            customers.get(customer.getKey()).addAccount(new Account(newAccountName, 0.0));
+            customers.get(customer.getKey()).addAccount(new Account(newAccountName, 0.0, 1234));
             return "SUCCESS";
         }
         return "FAIL";
@@ -91,10 +78,10 @@ public class NewBank {
         Customer customer = customers.get(customerID.getKey());
         List<Account> accountsAssociatedToCustomer = customer.getAccounts();
         Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
-        for(Account a: accountsAssociatedToCustomer){
+        for (Account a : accountsAssociatedToCustomer) {
             mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
         }
-        if(parsedInput.length != 4){
+        if (parsedInput.length != 4) {
             System.out.println("You have not provided all the required values to transfer money between your accounts. " +
                     "Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
             return "FAIL";
@@ -105,20 +92,20 @@ public class NewBank {
 
         //Get the 'from' account
         Account from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
-        if(from == null){
+        if (from == null) {
             System.out.println("Provided 'from' account does not exist, please check your input and try again.");
             return "FAIL";
         }
 
         //Get the 'to' account
         Account to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
-        if(to == null){
+        if (to == null) {
             System.out.println("Provided 'to' account does not exist, please check your input and try again.");
             return "FAIL";
         }
 
         //Check if the 'from' account has sufficient balance for the money move
-        if(from.getBalance() < amount){
+        if (from.getBalance() < amount) {
             System.out.println("This action is invalid, as this account does not have a sufficient balance.");
             return "FAIL";
         } else {
@@ -130,7 +117,7 @@ public class NewBank {
         }
     }
 
-    private String[] parseString(String inputString){
+    private String[] parseString(String inputString) {
         return inputString.split(" ");
     }
 

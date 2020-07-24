@@ -13,7 +13,7 @@ public class CustomerTest extends TestCase {
 
     @Before
     public void setUp() {
-        accountName = new Account("savings", 123);
+        accountName = new Account("savings", 123, 1234);
         customerName = new Customer();
         customerName.addAccount(accountName);
     }
@@ -26,7 +26,7 @@ public class CustomerTest extends TestCase {
     @Test
     public void testAddAccount() {
         try {
-            Account isa = new Account("isa", 123);
+            Account isa = new Account("isa", 123, 1234);
             customerName.addAccount(isa);
 
             Assert.assertTrue(true);

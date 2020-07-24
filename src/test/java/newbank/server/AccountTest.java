@@ -8,25 +8,25 @@ public class AccountTest extends TestCase {
 
     @Test
     public void testAddAccount_AllowNull() {
-        accountName = new Account(null, 123);
+        accountName = new Account(null, 123, 1234);
         assertEquals("null: 123.0", accountName.toString());
     }
 
     @Test
     public void testAddAccount() {
-        accountName = new Account("ISA", 123.45);
+        accountName = new Account("ISA", 123.45, 1234);
         assertEquals("ISA: 123.45", accountName.toString());
     }
 
     @Test
     public void testToString() {
-        accountName = new Account("savings", 123);
+        accountName = new Account("savings", 123, 1234);
         assertEquals("savings: 123.0", accountName.toString());
     }
 
     @Test
-    public void testGetAndSetAccountNameAndOpeningBalance(){
-        accountName = new Account("Checking", 123);
+    public void testGetAndSetAccountNameAndOpeningBalance() {
+        accountName = new Account("Checking", 123, 1234);
 
         assertEquals("Checking", accountName.getAccountName());
         assertEquals(123.0, accountName.getBalance());

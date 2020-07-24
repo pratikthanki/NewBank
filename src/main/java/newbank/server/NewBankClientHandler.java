@@ -10,12 +10,12 @@ import java.util.*;
 public class NewBankClientHandler extends Thread {
 
     private NewBank bank;
-    private BufferedReader in ;
+    private BufferedReader in;
     private PrintWriter out;
 
 
     public NewBankClientHandler(Socket s) throws IOException {
-        bank = NewBank.getBank(); 
+        bank = NewBank.getBank();
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
     }
@@ -25,19 +25,19 @@ public class NewBankClientHandler extends Thread {
         try {
             //ask for user name
             out.println("Enter Username");
-            String userName = in .readLine();
+            String userName = in.readLine();
             // ask for password
             out.println("Enter Password");
-            String password = in .readLine();
+            String password = in.readLine();
             out.println("Checking Details...");
             // authenticate user and get customer ID token from bank for use in subsequent requests
             CustomerID customer = bank.checkLogInDetails(userName, password);
             // if the user is authenticated then get requests from the user and process them
             if (customer != null) {
-                out.println("Log In Successful. Please choose one of the following options using :");
+                out.println("Login Successful. Enter a number to select one of the options:");
 
                 //Menu options and requests
-                HashMap < String, String > menuOptions = new HashMap < > ();
+                HashMap<String, String> menuOptions = new HashMap<>();
                 menuOptions.put("1", "SHOWMYACCOUNTS");
                 menuOptions.put("2", "NEWACCOUNT");
                 menuOptions.put("3", "MOVE");
@@ -48,10 +48,10 @@ public class NewBankClientHandler extends Thread {
                 processMenuSelection(menuOptions);
 
                 // handle user commands
-                handleUserCommands( in , customer, menuOptions);
+                handleUserCommands(in, customer, menuOptions);
 
             } else {
-                out.println("Log In Failed");
+                out.println("Login Failed");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,21 +67,21 @@ public class NewBankClientHandler extends Thread {
         //        }
     }
 
-    private void processMenuSelection(HashMap < String, String > hashMap) {
+    private void processMenuSelection(HashMap<String, String> hashMap) {
         // Print values
         int count = 0;
-        for (String key: hashMap.values()) {
+        for (String key : hashMap.values()) {
             count++;
             out.println(count + ".\t" + key);
         }
         out.println("9.\tQuit");
     }
 
-    private void handleUserCommands(BufferedReader in , CustomerID customer, HashMap < String, String > hashMap) throws IOException {
+    private void handleUserCommands(BufferedReader in, CustomerID customer, HashMap<String, String> hashMap) throws IOException {
         String menuItem;
         do {
             out.println("\nPlease select a new option:");
-            menuItem = in .readLine();
+            menuItem = in.readLine();
 
             switch (menuItem) {
                 case "1":
@@ -92,29 +92,29 @@ public class NewBankClientHandler extends Thread {
                 case "2":
                     out.println("Request from " + customer.getKey());
                     out.println("Please enter the new account's name:");
-                    String newAccountName = in .readLine();
-                    String response2 = bank.processRequest(customer,hashMap.get("2") + " " + newAccountName);
+                    String newAccountName = in.readLine();
+                    String response2 = bank.processRequest(customer, hashMap.get("2") + " " + newAccountName);
                     out.println(response2);
                     break;
                 case "3":
                     out.println("Request from " + customer.getKey());
                     out.println("Please follow the instructions below to complete your MOVE. You need to enter the amount, outgoing and receiving account.\nPlease enter the amount you would like to move:");
-                    String amount = in .readLine();
+                    String amount = in.readLine();
                     out.println("Please enter the outgoing account's name");
-                    String from= in .readLine();
+                    String from = in.readLine();
                     out.println("Please enter the receiving account's name");
-                    String to = in .readLine();
-                    String response3 = bank.processRequest(customer,hashMap.get("3") + " " + amount + " " + from + " " + to );
+                    String to = in.readLine();
+                    String response3 = bank.processRequest(customer, hashMap.get("3") + " " + amount + " " + from + " " + to);
                     out.println(response3);
                     break;
                 case "5":
-                	out.println("Retrieving customer detail...");
+                    out.println("Retrieving customer detail...");
                     out.println("CUSTOMER DETAIL");
                     out.println("----------------------");
                     out.println(bank.processRequest(customer, hashMap.get("5")));
                     out.println("----------------------");
                     out.println("Done.");
-                    
+
                     break;
                 case "9":
                     out.println("Bye-bye!");
