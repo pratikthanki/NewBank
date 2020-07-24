@@ -10,7 +10,8 @@ import java.util.Map;
 public class NewBank {
 
     private static final NewBank bank = new NewBank();
-    private HashMap<String,Customer> customers;
+    private static final IPaymentHelper paymentHelper = new IPaymentHelper();
+    private final HashMap<String,Customer> customers;
 
     private NewBank() {
         customers = new HashMap<>();
@@ -22,7 +23,7 @@ public class NewBank {
         bhagy.addAccount(new Account("Main", 1000.0));
         bhagy.updateDetail("Baby Hagy", new GregorianCalendar(1982, Calendar.DECEMBER, 20).getTime(), "bhagy@bath.ac.uk", "Bath, London");
         customers.put("Bhagy", bhagy);
-        
+
         Customer christina = new Customer();
         christina.addAccount(new Account("Savings", 1500.0));
         christina.updateDetail("Christina Aguilera", new GregorianCalendar(1985, Calendar.JANUARY, 11).getTime(), "christina.aguilera@celebrity.com", "Houston, USA");
@@ -47,17 +48,19 @@ public class NewBank {
     }
 
     // commands from the NewBank customer are processed in this method
-    public synchronized String processRequest(CustomerID customer, String request) {
-        if (customers.containsKey(customer.getKey())) {
+    public synchronized String processRequest(CustomerID customerID, String request) {
+        if (customers.containsKey(customerID.getKey())) {
             switch (parseString(request)[0]) {
                 case "SHOWMYACCOUNTS":
-                    return showMyAccounts(customer);
+                    return showMyAccounts(customerID);
                 case "NEWACCOUNT":
-                    return createNewAccount(customer, request);
+                    return createNewAccount(customerID,request);
                 case "MOVE":
-                    return moveMoney(customer, request);
+                    return moveMoney(customerID, request);
+                case "PAY":
+                    return payMoney(customerID, request);
                 case "CUSTOMERDETAIL":
-                    return getCustomer(customer, request).getDetail();
+                    return getCustomer(customerID, request).getDetail();
                 default:
                     return "FAIL";
             }
@@ -66,17 +69,17 @@ public class NewBank {
     }
 
     private Customer getCustomer(CustomerID customer, String request) {
-		if (request=="CUSTOMERDETAIL") {
+		if (request.equals("CUSTOMERDETAIL")) {
 			return customers.get(customer.getKey());
 		}
 		return null;
 	}
 
-	private String createNewAccount(CustomerID customer, String request) {
+    private String createNewAccount(CustomerID customerID, String request) {
         String[] requestAndDetails = request.split(" ");
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
-            customers.get(customer.getKey()).addAccount(new Account(newAccountName, 0.0));
+            customers.get(customerID.getKey()).addAccount(new Account(newAccountName, 0.0) );
             return "SUCCESS";
         }
         return "FAIL";
@@ -130,8 +133,54 @@ public class NewBank {
         }
     }
 
+    //pay another person
+    private String payMoney(CustomerID customerID, String request){
+        String[] parsedInput = parseString(request);
+
+        //payer
+        Customer payer = customers.get(customerID.getKey());
+
+        //check payee customer exists
+        String payeeCustomerName = parsedInput[1];
+        Customer payee = customers.get(payeeCustomerName);
+
+        //check user input
+        if(parsedInput.length != 4){
+            System.out.println("You have not provided all the required values to PAY money to another customer " +
+                    "Please provide the request in the following format: PAY <CustomerName> <Amount> <AccountFrom>");
+            return "FAIL";
+        }
+
+        //check if amount is a valid numerical value
+        String strAmount = parsedInput[2];
+        if (!paymentHelper.isNumeric(strAmount)){
+            return "FAIL";
+        }
+        Double amount = Double.valueOf(strAmount);
+
+        //Get the 'from' account
+        Account from = payer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
+
+        //Get the 'to' account
+        if (!paymentHelper.checkCustomerExists(customers, payeeCustomerName)) {
+            return "FAIL";
+        }
+        Account to = payee.getDefaultAccount();
+
+        //check if accounts exist and if the 'payerAccount' account has sufficient balance for the money move
+        if (payer.checkAccountExists(from) || payee.checkAccountExists(to)){
+         return "FAIL";
+        }
+
+        //PAY Name Amount FromAccount
+        if (!paymentHelper.calculateTransaction(from, to, amount)){
+            return "FAIL";
+        }
+        else{return "SUCCESS";}
+
+    }
+
     private String[] parseString(String inputString){
         return inputString.split(" ");
     }
-
 }
