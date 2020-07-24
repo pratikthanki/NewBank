@@ -5,7 +5,6 @@ import java.util.Map;
 
 public class IPaymentHelper implements IPayment {
 
-
     @Override
     //check if customer exists
     public Boolean checkCustomerExists(HashMap <String, Customer > map, String customer) {
