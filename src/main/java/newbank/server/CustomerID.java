@@ -10,5 +10,4 @@ public class CustomerID {
     public String getKey() {
         return key;
     }
-    
 }
