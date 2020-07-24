@@ -26,7 +26,7 @@ public class Account {
 
     public void setDefaultAccount(Customer customer) {
         int count = customer.getNumberOfAccounts();
-        defaultAccountStatus= count <= 1;
+        defaultAccountStatus = count <= 1;
     }
 
     public void addMoney(double money){
