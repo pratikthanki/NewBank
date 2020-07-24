@@ -1,48 +1,59 @@
 package newbank.server;
 
-import junit.framework.TestCase;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
-public class CustomerTest extends TestCase {
-    Account accountName;
-    Customer customerName;
+import static org.junit.Assert.*;
+
+public class CustomerTest {
+    Account savings;
+    Account isa;
+    Customer customer;
 
     @Before
     public void setUp() {
-        accountName = new Account("savings", 123, 1234);
-        customerName = new Customer();
-        customerName.addAccount(accountName);
+        savings = new Account("savings", 123, 1234);
+        customer = new Customer();
+        customer.addAccount(savings);
     }
 
     @Test
     public void testAccountsToString() {
-        Assert.assertEquals("savings: 123.0", customerName.accountsToString());
+        assertEquals("savings: 123.0", customer.accountsToString());
     }
 
     @Test
     public void testAddAccount() {
         try {
-            Account isa = new Account("isa", 123, 1234);
-            customerName.addAccount(isa);
-
-            Assert.assertTrue(true);
-            Assert.assertNotNull(customerName);
+            Account checkings = new Account("checkings", 123, 1234);
+            assertTrue(true);
+            assertFalse(checkings.isDefaultAccount());
         }
         catch(Exception e) {
-            Assert.fail();
+            fail();
+        }
+    }
+
+    @Test
+    public void testAddTwoAccounts() {
+        try {
+            isa = new Account("isa", 123, 1234);
+            assertTrue(true);
+            assertTrue(savings.isDefaultAccount());
+            assertFalse(isa.isDefaultAccount());
+
+        }
+        catch(Exception e) {
+            fail();
         }
     }
 
     @Test
     public void testGetAllAccounts(){
-        List<Account> accountList = customerName.getAccounts();
-
-        assertEquals(1, accountList.size());
-        assertEquals("savings", accountList.get(0).getAccountName());
-        assertEquals(123.0, accountList.get(0).getBalance());
+        assertEquals(1, customer.getNumberOfAccounts());
+        assertEquals("savings", savings.getAccountName());
+        assertEquals(123.0, savings.getBalance(),0);
     }
 }
