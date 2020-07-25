@@ -5,11 +5,13 @@ public class Account {
     private String accountName;
     private double balance;
     private boolean defaultAccountStatus;
+    private int accountPin;
 
-    public Account(String accountName, double openingBalance) {
+    public Account(String accountName, double openingBalance, int accountPin) {
         this.accountName = accountName;
         this.balance = openingBalance;
         this.defaultAccountStatus = false;
+        this.accountPin = accountPin;
     }
 
     public String getAccountName() {
@@ -29,11 +31,11 @@ public class Account {
         defaultAccountStatus = count <= 1;
     }
 
-    public void addMoney(double money){
+    public void addMoney(double money) {
         balance += money;
     }
 
-    public void withdrawMoney(double money){
+    public void withdrawMoney(double money) {
         balance -= money;
     }
 
@@ -44,4 +46,5 @@ public class Account {
     public String toString() {
         return (accountName + ": " + balance);
     }
+
 }

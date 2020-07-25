@@ -14,7 +14,7 @@ public class CustomerTest {
 
     @Before
     public void setUp() {
-        savings = new Account("savings", 123);
+        savings = new Account("savings", 123, 1234);
         customer = new Customer();
         customer.addAccount(savings);
     }
@@ -27,7 +27,7 @@ public class CustomerTest {
     @Test
     public void testAddAccount() {
         try {
-            Account checkings = new Account("checkings", 123);
+            Account checkings = new Account("checkings", 123, 1234);
             assertTrue(true);
             assertFalse(checkings.isDefaultAccount());
         }
@@ -39,7 +39,7 @@ public class CustomerTest {
     @Test
     public void testAddTwoAccounts() {
         try {
-            isa = new Account("isa", 123);
+            isa = new Account("isa", 123, 1234);
             assertTrue(true);
             assertTrue(savings.isDefaultAccount());
             assertFalse(isa.isDefaultAccount());

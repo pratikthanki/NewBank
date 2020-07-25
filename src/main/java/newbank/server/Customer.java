@@ -1,5 +1,8 @@
 package newbank.server;
 
+import newbank.server.authentication.BasicAuthenticator;
+
+import java.net.Authenticator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,88 +10,89 @@ import java.util.Date;
 
 public class Customer {
 
-    private final ArrayList<Account> accounts;
-    private Date dob;
+	private final ArrayList<Account> accounts;
+	private Date dob;
 	private String email;
-    private String name;
-    private String address;
-    private CustomerID customerID;
+	private String name;
+	private String address;
+	private CustomerID customerID;
+	private String password;
 
 	public Customer() {
-        accounts = new ArrayList<>();
-    }
+		accounts = new ArrayList<>();
+	}
 
 	//Constructor 2: Create customer while providing CustomerID
-    public Customer(CustomerID customerID) {
-    	this(); //Customer()
-        this.customerID = customerID;
-    }
+	public Customer(CustomerID customerID) {
+		this(); //Customer()
+		this.customerID = customerID;
+	}
 
-    public String getCustomerID() {
-        return customerID.getKey();
-    }
+	public String getCustomerID() {
+		return customerID.getKey();
+	}
 
-    public ArrayList<Account> getAccounts(){
-        return accounts;
-    }
+	public ArrayList<Account> getAccounts() {
+		return accounts;
+	}
 
-    public String accountsToString() {
-        String s = "";
-        for(Account a : accounts) {
-            s += a.toString();
-        }
-        return s;
-    }
+	public String accountsToString() {
+		String s = "";
+		for (Account a : accounts) {
+			s += a.toString();
+		}
+		return s;
+	}
 
-    public void addAccount(Account account) {
-        accounts.add(account);
-        account.setDefaultAccount(this);
-    }
+	public void addAccount(Account account) {
+		accounts.add(account);
+		account.setDefaultAccount(this);
+	}
 
-    //get number of default accounts
-    public int getNumberOfAccounts() {
-        return accounts.size();
-    }
+	//get number of default accounts
+	public int getNumberOfAccounts() {
+		return accounts.size();
+	}
 
-    //get a customer's default account
-    public Account getDefaultAccount() {
-        for (Account a: accounts){
-            if (a.isDefaultAccount()){
-                return a;
-            }
-        }
-        return null;
-    }
+	//get a customer's default account
+	public Account getDefaultAccount() {
+		for (Account a : accounts) {
+			if (a.isDefaultAccount()) {
+				return a;
+			}
+		}
+		return null;
+	}
 
-    //map each customer to customerName
-    public HashMap<String, Account> getHasMapForAllCustomerAccounts(){
-        // Create a HashMap
-        HashMap < String, Account > map = new HashMap < > ();
-        for (Account a: accounts) {
-            map.put(a.getAccountName(), a);
-        }
-        return map;
-    }
+	//map each customer to customerName
+	public HashMap<String, Account> getHasMapForAllCustomerAccounts() {
+		// Create a HashMap
+		HashMap<String, Account> map = new HashMap<>();
+		for (Account a : accounts) {
+			map.put(a.getAccountName(), a);
+		}
+		return map;
+	}
 
-    //check if account exists
-    public Boolean checkAccountExists(Account account) {
-        try {
+	//check if account exists
+	public Boolean checkAccountExists(Account account) {
+		try {
 
-            HashMap < String, Account > map = getHasMapForAllCustomerAccounts();
-            // Iterate over the HashMap
-            for (Map.Entry < String, Account > entry: map.entrySet()) {
-                // Get the entry at this iteration and check if this key is the required key
-                if (account.toString().equals(entry.getKey())) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return false;
-    }
+			HashMap<String, Account> map = getHasMapForAllCustomerAccounts();
+			// Iterate over the HashMap
+			for (Map.Entry<String, Account> entry : map.entrySet()) {
+				// Get the entry at this iteration and check if this key is the required key
+				if (account.toString().equals(entry.getKey())) {
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		return false;
+	}
 
-    public Date getDob() {
+	public Date getDob() {
 		return this.dob;
 	}
 
@@ -136,9 +140,41 @@ public class Customer {
 	}
 
 	public boolean updateDetail(String name, Date dob, String email, String address) {
-		if (setName(name) && setEmail(email) && setDob(dob) && setAddress(address) )
-			return true;
+		return setName(name) && setEmail(email) && setDob(dob) && setAddress(address);
+	}
+
+	public boolean setPassword(String password) {
+		if (isValidPassword(password)) this.password = password;
 
 		return false;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	private boolean isValidPassword(String password) {
+		int minimumPasswordLength = 8;
+		if (password.length() < minimumPasswordLength) return false;
+
+		int charCount = 0;
+		int numCount = 0;
+		for (int i = 0; i < password.length(); i++) {
+			char ch = password.charAt(i);
+
+			if (isInt(ch)) numCount++;
+			else if (isLetter(ch)) charCount++;
+			else return false;
+		}
+		return (charCount >= 2 && numCount >= 2);
+	}
+
+	private static boolean isLetter(char ch) {
+		ch = Character.toUpperCase(ch);
+		return (ch >= 'A' && ch <= 'Z');
+	}
+
+	private static boolean isInt(char ch) {
+		return (ch >= '0' && ch <= '9');
 	}
 }

@@ -33,7 +33,7 @@ public class NewBankTest {
     @Test
     public void checkLogInDetailsSuccess() {
         String username = "John";
-        String password = "somePassword";
+        String password = "MyPa55w0rd";
         try{
             newBank.checkLogInDetails(username, password);
             assertTrue(true);
