@@ -3,9 +3,9 @@ package newbank.server;
 import newbank.database.DatabaseClient;
 import newbank.server.authentication.BasicAuthenticator;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static newbank.database.static_data.NewBankData.*;
 
 public class NewBank {
 
@@ -30,28 +30,28 @@ public class NewBank {
     }
 
     // commands from the NewBank customer are processed in this method
-    public synchronized String processRequest(CustomerID customerID, String request) {
+    public synchronized String processRequest(PrintWriter out, CustomerID customerID, String request) {
         if (customers.containsKey(customerID.getKey())) {
             switch (parseString(request)[0]) {
-                case "SHOWMYACCOUNTS":
+                case showMyAccounts:
                     return showMyAccounts(customerID);
-                case "NEWACCOUNT":
+                case newAccount:
                     return createNewAccount(customerID, request);
-                case "MOVE":
-                    return moveMoney(customerID, request);
-                case "PAY":
-                    return payMoney(customerID, request);
-                case "CUSTOMERDETAIL":
+                case move:
+                    return moveMoney(out, customerID, request);
+                case pay:
+                    return payMoney(out, customerID, request);
+                case customerDetail:
                     return getCustomer(customerID, request).getDetail();
                 default:
-                    return "FAIL";
+                    return Statuses.FAIL.toString();
             }
         }
-        return "FAIL";
+        return Statuses.FAIL.toString();
     }
 
     private Customer getCustomer(CustomerID customer, String request) {
-        if (request.equals("CUSTOMERDETAIL")) {
+        if (request.equals(customerDetail)) {
             return customers.get(customer.getKey());
         }
         return null;
@@ -62,61 +62,57 @@ public class NewBank {
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
             customers.get(customerID.getKey()).addAccount(new Account(newAccountName, 0.0, 1234));
-            return "SUCCESS";
+            return Statuses.SUCCESS.toString();
         }
-        return "FAIL";
+        return Statuses.FAIL.toString();
     }
 
     private String showMyAccounts(CustomerID customer) {
         return (customers.get(customer.getKey())).accountsToString();
     }
 
-    private String moveMoney(CustomerID customerID, String request) {
+    private String moveMoney(PrintWriter out, CustomerID customerID, String request) {
+        //User input
         String[] parsedInput = parseString(request);
+
+        //customer
         Customer customer = customers.get(customerID.getKey());
-        List<Account> accountsAssociatedToCustomer = customer.getAccounts();
-        Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
-        for (Account a : accountsAssociatedToCustomer) {
-            mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
-        }
+
+        //check user input
         if (parsedInput.length != 4) {
-            System.out.println("You have not provided all the required values to transfer money between your accounts. " +
-                    "Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
-            return "FAIL";
+            out.println(moveWrongSyntaxMessage);
+            return Statuses.FAIL.toString();
         }
 
-        //Get amount
-        Double amount = Double.valueOf(parsedInput[1]);
+        //check if amount is a valid numerical value
+        String strAmount = parsedInput[1];
+        if (!paymentHelper.isNumeric(strAmount)) {
+            return Statuses.FAIL.toString();
+        }
+        Double amount = Double.valueOf(strAmount);
 
         //Get the 'from' account
-        Account from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
-        if (from == null) {
-            System.out.println("Provided 'from' account does not exist, please check your input and try again.");
-            return "FAIL";
-        }
+        Account from = customer.getHasMapForAllCustomerAccounts().get(parsedInput[2]);
 
         //Get the 'to' account
-        Account to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
-        if (to == null) {
-            System.out.println("Provided 'to' account does not exist, please check your input and try again.");
-            return "FAIL";
+        Account to = customer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
+
+        //check if accounts exist and if the 'payerAccount' account has sufficient balance for the money move
+        if (customer.checkAccountExists(from) || customer.checkAccountExists(to)) {
+            return Statuses.FAIL.toString();
         }
 
-        //Check if the 'from' account has sufficient balance for the money move
-        if (from.getBalance() < amount) {
-            System.out.println("This action is invalid, as this account does not have a sufficient balance.");
-            return "FAIL";
+        //Calculate transaction
+        if (!paymentHelper.calculateTransaction(from, to, amount)) {
+            return Statuses.FAIL.toString();
         } else {
-            from.withdrawMoney(amount);
-            to.addMoney(amount);
-            System.out.println("From Account:" + from.toString());
-            System.out.println("To Account:" + to.toString());
-            return "SUCCESS";
+            return Statuses.SUCCESS.toString();
         }
     }
 
     //pay another person
-    private String payMoney(CustomerID customerID, String request) {
+    private String payMoney(PrintWriter out, CustomerID customerID, String request) {
+        //User input
         String[] parsedInput = parseString(request);
 
         //payer
@@ -128,37 +124,36 @@ public class NewBank {
 
         //check user input
         if (parsedInput.length != 4) {
-            System.out.println("You have not provided all the required values to PAY money to another customer " +
-                    "Please provide the request in the following format: PAY <CustomerName> <Amount> <AccountFrom>");
-            return "FAIL";
+            out.println(payWrongSyntaxMessage);
+            return Statuses.FAIL.toString();
         }
 
         //check if amount is a valid numerical value
         String strAmount = parsedInput[2];
         if (!paymentHelper.isNumeric(strAmount)) {
-            return "FAIL";
+            return Statuses.FAIL.toString();
         }
         Double amount = Double.valueOf(strAmount);
 
         //Get the 'from' account
         Account from = payer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
 
-        //Get the 'to' account
+        //Check if customer exists and Get the 'to' account
         if (!paymentHelper.checkCustomerExists(customers, payeeCustomerName)) {
-            return "FAIL";
+            return Statuses.FAIL.toString();
         }
         Account to = payee.getDefaultAccount();
 
         //check if accounts exist and if the 'payerAccount' account has sufficient balance for the money move
         if (payer.checkAccountExists(from) || payee.checkAccountExists(to)) {
-            return "FAIL";
+            return Statuses.FAIL.toString();
         }
 
-        //PAY Name Amount FromAccount
+        //Calculate transaction
         if (!paymentHelper.calculateTransaction(from, to, amount)) {
-            return "FAIL";
+            return Statuses.FAIL.toString();
         } else {
-            return "SUCCESS";
+            return Statuses.SUCCESS.toString();
         }
 
     }
