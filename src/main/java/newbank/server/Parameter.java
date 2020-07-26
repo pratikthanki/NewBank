@@ -15,5 +15,6 @@ public enum Parameter {
 	DOB,
 	FROM_ACCOUNT,
 	TO_ACCOUNT,
-	AMOUNT
+	AMOUNT,
+	PAYEE_CUSTOMER_NAME
 }

@@ -21,7 +21,5 @@ public enum Command {
 	
 	QUIT,
 	LOGIN, 
-	NEW_USER_REGISTRATION,
-	
-	VIEWCASHBACK,
+	NEW_USER_REGISTRATION
 }

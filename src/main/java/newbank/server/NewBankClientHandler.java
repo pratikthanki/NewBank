@@ -83,6 +83,7 @@ public class NewBankClientHandler extends Thread {
         	Command command = menuItem.getCommand();
         	Map<Parameter,String> properties = new HashMap<Parameter,String>();
             
+        	//obtain values provided by user
 			menuItem.getCommandParameters().forEach((key, commandParameter)-> {
 				properties.put(commandParameter.getParameter(),commandParameter.getValue());
 			});
@@ -103,6 +104,10 @@ public class NewBankClientHandler extends Thread {
                     out.println("Request from " + customer.getKey());
                     String response3 = bank.processRequest(customer,command,properties );
                     out.println(response3);
+                    break;
+                case PAY:
+                    out.println("Request from " + customer.getKey());
+                    out.println(bank.processRequest(customer,command,properties));
                     break;
                 case SHOWCUSTOMERDETAIL:
                 	out.println("Retrieving customer detail...");

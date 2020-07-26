@@ -119,8 +119,11 @@ public final class Menu {
 		move.addCommandParameter(new CommandParameter(Parameter.TO_ACCOUNT,"","Please enter the receiving account's name: ","String"));
 		authUserMenuOptions.put("3", move);
 		
-		authUserMenuOptions.put("4", 
-				new MenuItem(MenuOptions.AUTHENTICATED_USER,Command.PAY,"PAY", "Payment", null));
+		MenuItem pay = new MenuItem(MenuOptions.AUTHENTICATED_USER, Command.PAY, "PAY","Pay Money");
+		pay.addCommandParameter(new CommandParameter(Parameter.AMOUNT,"",".\nPlease enter the amount to PAY: \n","String"));
+		pay.addCommandParameter(new CommandParameter(Parameter.FROM_ACCOUNT,"","Which account account are you paying from? (e.g. Savings, Checking): ","String"));
+		pay.addCommandParameter(new CommandParameter(Parameter.PAYEE_CUSTOMER_NAME,"","Which Customer are you paying? ","String"));
+		authUserMenuOptions.put("4", pay);
 		
 		authUserMenuOptions.put("5", 
 				new MenuItem(MenuOptions.AUTHENTICATED_USER,Command.SHOWCUSTOMERDETAIL,"SHOWCUSTOMERDETAIL","Show Customer detail", null));
