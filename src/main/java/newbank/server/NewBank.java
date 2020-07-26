@@ -3,11 +3,6 @@ package newbank.server;
 import newbank.database.DatabaseClient;
 import newbank.server.authentication.BasicAuthenticator;
 
-import javax.xml.crypto.Data;
-import java.net.Authenticator;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

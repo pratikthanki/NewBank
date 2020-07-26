@@ -1,8 +1,5 @@
 package newbank.server;
 
-import newbank.server.authentication.BasicAuthenticator;
-
-import java.net.Authenticator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

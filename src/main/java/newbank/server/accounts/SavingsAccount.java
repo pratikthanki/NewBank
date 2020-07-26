@@ -2,8 +2,6 @@ package newbank.server.accounts;
 
 import newbank.server.Account;
 import newbank.server.Customer;
-import newbank.server.CustomerID;
-import newbank.server.NewBank;
 
 import java.time.LocalDateTime;
 import java.util.List;
