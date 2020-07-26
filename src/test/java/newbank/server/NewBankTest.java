@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.util.Map;
+
 public class NewBankTest {
     NewBank newBank = NewBank.getBank();
     CustomerID customerID = new CustomerID("John");
@@ -36,8 +38,9 @@ public class NewBankTest {
 
     @Test
     public void processRequestFail() {
+    	//Map<Parameter, String> properties = new HashMap<>();
         String expected = "FAIL";
-        assertEquals(expected, newBank.processRequest(customerID, "VIEWCASHBACK"));
+        assertEquals(expected, newBank.processRequest(customerID, Command.VIEWCASHBACK));
     }
 
     @Test
@@ -48,6 +51,7 @@ public class NewBankTest {
 
     @Test
     public void moveMoneyBetweenAccountsSuccess(){
+    	//HashMap<>
         String result = newBank.processRequest(customerID, "MOVE 50 Checking Savings");
 
         assertEquals("SUCCESS", result);
