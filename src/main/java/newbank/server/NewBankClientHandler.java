@@ -1,13 +1,10 @@
 package newbank.server;
 
-//import org.graalvm.compiler.lir.StandardOp;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class NewBankClientHandler extends Thread {
@@ -25,167 +22,134 @@ public class NewBankClientHandler extends Thread {
     public void run() {
         // keep getting requests from the client and processing them
         try {
-            //ask for user name
-            out.println("Enter Username");
-            String userName = in .readLine();
-            // ask for password
-            out.println("Enter Password");
-            String password = in .readLine();
-            out.println("Checking Details...");
-            // authenticate user and get customer ID token from bank for use in subsequent requests
-            CustomerID customer = bank.checkLogInDetails(userName, password);
-            // if the user is authenticated then get requests from the user and process them
-            if (customer != null) {
-                out.println("Log In Successful. Please choose one of the following options using :");
-                
-                // handle user commands
-                handleUserCommands( in , customer);
+        	//menuItem is return with parameters gathered.
+        	MenuItem menuItem = Menu.present(MenuOptions.INITIAL_OPTIONS, out, in);
+        	
+        	switch (menuItem.getCommand()){
+        		case NEW_USER_REGISTRATION: 
+        			
+        			Map<Parameter,String> properties = new HashMap<>();
+        			menuItem.getCommandParameters().forEach((key, commandParameter)-> {
+        				properties.put(commandParameter.getParameter(),commandParameter.getValue());
+        			});
+        			String newUserResponse = bank.registerNewCustomer(properties);
+        			out.println(newUserResponse);
+        			this.run();
+        			break;
+        			
+        		case LOGIN:
+        			String username = menuItem.getCommandParameters().get(Parameter.USERNAME).getValue();
+	                String password = menuItem.getCommandParameters().get(Parameter.PASSWORD).getValue();
+	                out.println("Checking Details...");
+	                // authenticate user and get customer ID token from bank for use in subsequent requests
+	                CustomerID customer = bank.checkLogInDetails(username, password);
+	                // if the user is authenticated then get requests from the user and process them
+	                if (customer != null) {
+	                    out.println("Log In Successful. \nPlease choose one of the following options using:\n");
+	                    // handle user commands
+	                    handleUserCommands( in , customer);
 
-            } else {
-                out.println("Log In Failed");
-            }
+	                } else {
+	                    out.println("Log In Failed");
+	                }
+	        		break;
+	        		
+        		case QUIT:
+        			out.println("Bye bye!");
+        			return;
+	        	default:
+	        		out.println("Invalid Option selected.");
+        	}
+        	 
         } catch (IOException e) {
             e.printStackTrace();
         }
-                 finally {
-                    try {
-                        in.close();
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Thread.currentThread().interrupt();
-                    }
-                }
-    }
-
-    private void printMenu(HashMap < String, String > hashMap) {
-        // Print values
-        int count = 0;
-        for (String key: hashMap.values()) {
-            count++;
-            out.println(count + ".\t" + key);
-        }
-        out.println("9.\tQuit");
+	     finally {
+	        try {
+	            in.close();
+	            out.close();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	            Thread.currentThread().interrupt();
+	        }
+	    }
     }
 
     private void handleUserCommands(BufferedReader in , CustomerID customer) throws IOException {
-       
-    	String menuItem;
+    	//String menuItem;
         do {
-      
         	//Menu options and requests
-		   HashMap < String, String > menuOptions = new HashMap < > ();
-		   menuOptions.put("1", "SHOWMYACCOUNTS");
-		   menuOptions.put("2", "NEWACCOUNT");
-		   menuOptions.put("3", "MOVE");
-		   menuOptions.put("4", "PAY");
-		   menuOptions.put("5", "CUSTOMERDETAIL");
-		   menuOptions.put("6", "UPDATECUSTOMERDETAIL");
-		   
-		   printMenu(menuOptions);
-               
-           out.println("\nPlease select a new option:");
+        	MenuItem menuItem = Menu.present(MenuOptions.AUTHENTICATED_USER, out, in);
+        	Command command = menuItem.getCommand();
+        	Map<Parameter,String> properties = new HashMap<Parameter,String>();
             
-            menuItem = in .readLine();
-
-            switch (menuItem) {
-                case "1":
+			menuItem.getCommandParameters().forEach((key, commandParameter)-> {
+				properties.put(commandParameter.getParameter(),commandParameter.getValue());
+			});
+        	
+            switch (command) {
+            	
+                case SHOWMYACCOUNTS:
                     out.println("Request from " + customer.getKey());
-                    String response = bank.processRequest(customer, menuOptions.get("1"));
+                    String response = bank.processRequest(customer, command, properties); //properties is not used in SHOWACCPOUNTS
                     out.println(response);
                     break;
-                case "2":
+                case NEWACCOUNT:
                     out.println("Request from " + customer.getKey());
-                    out.println("Please enter the new account's name:");
-                    String newAccountName = in .readLine();
-                    String response2 = bank.processRequest(customer,menuOptions.get("2") + " " + newAccountName);
+                    String response2 = bank.processRequest(customer,command, properties);
                     out.println(response2);
                     break;
-                case "3":
+                case MOVE:
                     out.println("Request from " + customer.getKey());
-                    out.println("Please follow the instructions below to complete your MOVE. You need to enter the amount, outgoing and receiving account.\nPlease enter the amount you would like to move:");
-                    String amount = in .readLine();
-                    out.println("Please enter the outgoing account's name");
-                    String from= in .readLine();
-                    out.println("Please enter the receiving account's name");
-                    String to = in .readLine();
-                    String response3 = bank.processRequest(customer,menuOptions.get("3") + " " + amount + " " + from + " " + to );
+                    String response3 = bank.processRequest(customer,command,properties );
                     out.println(response3);
                     break;
-                case "5":
+                case SHOWCUSTOMERDETAIL:
                 	out.println("Retrieving customer detail...");
                     out.println("CUSTOMER DETAIL");
                     out.println("----------------------");
-                    out.println(bank.processRequest(customer, menuOptions.get("5")));
+                    out.println(bank.processRequest(customer, command, properties));
                     out.println("----------------------");
                     out.println("Done.");
-                    
                     break;
-                case "6":
-                	//Menu options and requests
-                	menuOptions.clear(); 
-                	menuOptions.put("1", "UPDATECUSTOMEREMAIL");
-                	menuOptions.put("2", "UPDATECUSTOMERADDRESS");
-                	menuOptions.put("3", "UPDATECUSTOMERDOB");
-                	menuOptions.put("4", "UPDATECUSTOMERNAME");
-         		   
-                	out.println("Please select data to update:");
-         		    printMenu(menuOptions);
-         		    
-         		    menuItem = in .readLine();
-         		    
-         		   switch (menuItem) {
-         		   		case "1":
-         		   			out.println("The current email address is: " + bank.processRequest(customer, "GETCUSTOMEREMAIL") );
-         		   			out.println("Please type in the new email address: ");
-         		   			String email = in .readLine();
-         		   			String emailResponse = bank.processRequest(customer, menuOptions.get("1") + " " + email);
-         		   			out.println(emailResponse);
-         		   			break;
-         		   			
-         		   		case "2":
-	         		   		out.println("The current address is: " + bank.processRequest(customer, "GETCUSTOMERADDRESS") );
-	     		   			out.println("Please type in the new address: ");
-	     		   			String address = in .readLine();
-	     		   			String addressResponse = bank.processRequest(customer, menuOptions.get("2") + " " + address);
-	     		   			out.println(addressResponse);
-	     		   			break;
-	     		   			
-         		   		case "3":
-	         		   		out.println("The current DOB is: " + bank.processRequest(customer, "GETCUSTOMERDOB") );
-	     		   			out.println("Please type in the new DOB: " + new SimpleDateFormat("d MM yyyy").toPattern() );
-	     		   			String dob = in .readLine();
-	     		   			String dobResponse = bank.processRequest(customer, menuOptions.get("3") + " " + dob);
-	     		   			out.println(dobResponse);
-	     		   			break;
-	         		   	case "4":
-	         		   		out.println("The current name is: " + bank.processRequest(customer, "GETCUSTOMERNAME") );
-	     		   			out.println("Please type in the new name: ");
-	     		   			String newName = in .readLine();
-	     		   			String nameResponse = bank.processRequest(customer, menuOptions.get("4") + " " + newName);
-	     		   			out.println(nameResponse);
-	     		   			break;
-	     		   			
-	         		   	case "9":
-	                        out.println("Bye-bye!");
-	                        break;
-                   
-         		   		default:
-         		   			out.println("Invalid choice.");
-         		   }
-         		    
-                    break;
-                case "9":
+                case UPDATECUSTOMEREMAIL:
+                	out.println("Retrieving customer detail...");
+                    out.println("The old email address is: " + bank.processRequest(customer, Command.GETCUSTOMEREMAIL,properties));
+                    out.println("Updating EMAIL ADDRESS...");
+                    out.println(bank.processRequest(customer, command, properties));
+                    out.println("----------------------");
+                    out.println("Done.");
+                	break;
+                case UPDATECUSTOMERADDRESS:
+                	out.println("Retrieving customer detail...");
+                    out.println("The old ADDRESS is: " + bank.processRequest(customer, Command.GETCUSTOMERADDRESS,properties));
+                    out.println("Updating ADDRESS...");
+                    out.println(bank.processRequest(customer, command, properties));
+                    out.println("----------------------");
+                    out.println("Done.");
+                	break;
+                case UPDATECUSTOMERDOB:
+                	out.println("Retrieving customer detail...");
+                    out.println("The old DATE OF BIRTH is: " + bank.processRequest(customer, Command.GETCUSTOMERDOB,properties));
+                    out.println("Updating Customer DATE OF BIRTH...");
+                    out.println(bank.processRequest(customer, command, properties));
+                    out.println("----------------------");
+                    out.println("Done.");
+                	break;
+                case UPDATECUSTOMERNAME:
+                	out.println("Retrieving customer detail...");
+                    out.println("The old Customer NAME is: " + bank.processRequest(customer, Command.GETCUSTOMERNAME,properties));
+                    out.println("Updating Customer NAME...");
+                    out.println(bank.processRequest(customer, command, properties));
+                    out.println("----------------------");
+                    out.println("Done.");
+                	break;
+                case QUIT:
                     out.println("Bye-bye!");
-                    break;
+                    return;
                 default:
-                    out.println("Invalid choice.");
+                    out.println("Invalid command option.");
             }
-        } while (!menuItem.equals("9"));
+        } while (true);
     }
-
-}                
-         		  ile (!menuItem.equals("9"));
-    }
-
 }
