@@ -43,6 +43,23 @@ public class NewBankData {
     public static String done = "Done.";
     public static String invalidChoice = "Invalid choice.";
     public static String emptyString = " ";
+    public static String accountLabel = "Account: ";
+    public static String insufficientBalanceMessage = " does not have sufficient balance for this transaction.";
+    public static String invalidAccountNameCharacters = " is not a valid account name. Please try again,  using alphabetical characters only.";
+    public static String nonNumericalAmount = " is not a valid amount. Please try again, using numerical characters only:";
+    public static String accountNotFound = " is not a valid account. Please try again:";
+    public static String customerNotFound = " is not a member of New Bank. Please try again:";
+
+
+
+
+
+
+
+
+
+
+
 
     //IDs
     public final static String one = "1";
