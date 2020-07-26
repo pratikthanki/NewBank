@@ -59,8 +59,17 @@ public class NewBank {
         }
         return null;
     }
-
+    
+    public synchronized String processRequest(CustomerID customer, String request) {
+    	return "FAIL";
+    }
+    
     // commands from the NewBank customer are processed in this method
+    public synchronized String processRequest(CustomerID customer, Command command) {
+    	Map<Parameter, String> properties = new HashMap<>();
+    	return processRequest(customer, command, properties);
+    }
+    
     public synchronized String processRequest(CustomerID customer, Command command, Map<Parameter, String> properties) {
         if (customers.containsKey(customer.getKey())) {
             switch (command) {
@@ -197,12 +206,15 @@ public class NewBank {
         }
 
         //Check if the 'from' account has sufficient balance for the money move
-        if(from.getOpeningBalance() < amount){
-            return "FAIL: This action is invalid, as this account does not have a sufficient balance.";
+        if(from.getBalance() < amount){
+            System.out.println("This action is invalid, as this account does not have a sufficient balance.");
+            return "FAIL";
         } else {
-            from.setOpeningBalance(from.getOpeningBalance() - amount);
-            to.setOpeningBalance(to.getOpeningBalance() + amount);
-            return "SUCCESS: " + "From Account: " + from.toString() + " " + "To Account:" + to.toString() + "\n" ; 
+            from.withdrawMoney(amount);
+            to.addMoney(amount);
+            System.out.println("From Account:" + from.toString());
+            System.out.println("To Account:" + to.toString());
+            return "SUCCESS";
         }
     }
 
