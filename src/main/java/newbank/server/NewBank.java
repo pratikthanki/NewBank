@@ -1,6 +1,5 @@
 package newbank.server;
 
-//import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -8,7 +7,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-//import java.util.Locale;
 import java.util.Map;
 
 public class NewBank {
@@ -63,61 +61,60 @@ public class NewBank {
     }
 
     // commands from the NewBank customer are processed in this method
-    public synchronized String processRequest(CustomerID customer, String request) {
+    public synchronized String processRequest(CustomerID customer, Command command, Map<Parameter, String> properties) {
         if (customers.containsKey(customer.getKey())) {
-            switch (parseString(request)[0]) {
-                case "SHOWMYACCOUNTS":
+            switch (command) {
+                case SHOWMYACCOUNTS:
                     return showMyAccounts(customer);
-                case "NEWACCOUNT":
-                    return createNewAccount(customer, request);
-                case "MOVE":
-                    return moveMoney(customer, request);
-                case "CUSTOMERDETAIL":
-                    return getCustomer(customer, request).getDetail();
-                case "GETCUSTOMEREMAIL":
-                    return getCustomer(customer, request).getEmail();
-                case "GETCUSTOMERADDRESS":
-                    return getCustomer(customer, request).getAddress();
-                case "GETCUSTOMERNAME":
-                    return getCustomer(customer, request).getName();
-                case "GETCUSTOMERDOB":
-                    return String.format("%1$tb %1$te, %1$tY",getCustomer(customer, request).getDob());
-                case "UPDATECUSTOMEREMAIL":
-                    return updateCustomerEmail(customer, request);
-                case "UPDATECUSTOMERADDRESS":
-                    return updateCustomerAddress(customer, request);
-                case "UPDATECUSTOMERNAME":
-                    return updateCustomerName(customer, request);
-                case "UPDATECUSTOMERDOB":
-                    return updateCustomerDob(customer, request);
+                case NEWACCOUNT:
+                    return createNewAccount(customer, command, properties);
+                case MOVE:
+                    return moveMoney(customer, command, properties);
+                case SHOWCUSTOMERDETAIL:
+                    return getCustomer(customer, command, properties).getDetail();
+                case GETCUSTOMEREMAIL:
+                    return getCustomer(customer, command, properties).getEmail();
+                case GETCUSTOMERADDRESS:
+                    return getCustomer(customer, command, properties).getAddress();
+                case GETCUSTOMERNAME:
+                    return getCustomer(customer, command, properties).getName();
+                case GETCUSTOMERDOB:
+                    return String.format("%1$tb %1$te, %1$tY",getCustomer(customer, command, properties).getDob());
+                case UPDATECUSTOMEREMAIL:
+                    return updateCustomerEmail(customer, command, properties);
+                case UPDATECUSTOMERADDRESS:
+                    return updateCustomerAddress(customer, command, properties);
+                case UPDATECUSTOMERDOB:
+                    return updateCustomerDob(customer, command, properties);
+                case UPDATECUSTOMERNAME:
+                    return updateCustomerName(customer, command, properties);
                 default:
-                    return "FAIL";
+                    return "FAIL: Internal Error.";
             }
         }
         return "FAIL";
     }
 
-    private Customer getCustomer(CustomerID customer, String request) {
+    private Customer getCustomer(CustomerID customer, Command command, Map<Parameter, String> properties) {
 		if (customer.getKey() != null) {
 			return customers.get(customer.getKey());
 		}
 		return null;
 	}
     
-    private String updateCustomerEmail(CustomerID customer, String request) {
-    	 String[] requestAndDetails = request.split(" ");
-         if (requestAndDetails.length == 2) {
-             String newEmail = requestAndDetails[1];
+    private String updateCustomerEmail(CustomerID customer, Command command, Map<Parameter, String> properties) {
+    	String newEmail = properties.get(Parameter.EMAIL);
+         if (InputValidator.isEmailAddressValid(newEmail)) {
              customers.get(customer.getKey()).setEmail(newEmail); 
              return "SUCCESS";
          }
          return "FAIL";
 	}
     
-    private String updateCustomerAddress(CustomerID customer, String request) {
-    	String newAddress = request.substring(request.indexOf(" ")+1, request.length());
+    private String updateCustomerAddress(CustomerID customer, Command command, Map<Parameter, String> properties) {
+    	String newAddress = properties.get(Parameter.ADDRESS);
         
-        if (newAddress.length() > 0) {
+        if (InputValidator.validateTextLength(newAddress, 4, -1)) {
         	customers.get(customer.getKey()).setAddress(newAddress); 
             return "SUCCESS";
         }
@@ -125,20 +122,20 @@ public class NewBank {
         return "FAIL";
 	}
     
-    private String updateCustomerName(CustomerID customer, String request) {
-    	String newName = request.substring(request.indexOf(" ")+1, request.length());
+    private String updateCustomerName(CustomerID customer, Command command, Map<Parameter, String> properties){
+    	String newName = properties.get(Parameter.FIRSTNAME) + " " +  properties.get(Parameter.SURNAME);
    
-        if (newName.length() > 0) {
+    	if (InputValidator.validateTextLength(newName, 4, -1)) {
             customers.get(customer.getKey()).setName(newName); 
             return "SUCCESS";
         }
         return "FAIL";
 	}
     
-    private String updateCustomerDob(CustomerID customer, String request) {
-    	String dob = request.substring(request.indexOf(" ")+1, request.length());
+    private String updateCustomerDob(CustomerID customer, Command command, Map<Parameter, String> properties) {
+    	String dob = properties.get(Parameter.DOB);
     	
-        if (dob.length() == 0) return "FAIL";
+        if (InputValidator.parseDate(dob, "d MM yyyy")==null) return "FAIL: Invalid date format for Date of Birth" ;
         
 		try {
 			SimpleDateFormat parser = new SimpleDateFormat("d MM yyyy");
@@ -154,10 +151,9 @@ public class NewBank {
         
 	}
 
-	private String createNewAccount(CustomerID customer, String request) {
-        String[] requestAndDetails = request.split(" ");
-        if (requestAndDetails.length == 2) {
-            String newAccountName = requestAndDetails[1];
+	private String createNewAccount(CustomerID customer, Command command, Map<Parameter, String> properties) {
+		String newAccountName = properties.get(Parameter.ACCOUNT_NAME);
+        if (InputValidator.validateTextLength(newAccountName, 2, -1)) {
             customers.get(customer.getKey()).addAccount(new Account(newAccountName, 0.0));
             return "SUCCESS";
         }
@@ -168,52 +164,69 @@ public class NewBank {
         return (customers.get(customer.getKey())).accountsToString();
     }
 
-    private String moveMoney(CustomerID customerID, String request) {
-        String[] parsedInput = parseString(request);
-        Customer customer = customers.get(customerID.getKey());
-        List<Account> accountsAssociatedToCustomer = customer.getAccounts();
+    private String moveMoney(CustomerID customer, Command command, Map<Parameter, String> properties) {
+    	String amountx = properties.get(Parameter.AMOUNT);
+    	String from_account = properties.get(Parameter.FROM_ACCOUNT);
+    	String to_account = properties.get(Parameter.TO_ACCOUNT);
+        Customer c = customers.get(customer.getKey()); 
+        
+        List<Account> accountsAssociatedToCustomer = c.getAccounts();
         Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
         for(Account a: accountsAssociatedToCustomer){
             mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
         }
-        if(parsedInput.length != 4){
+        if(properties.size() != 4){
             System.out.println("You have not provided all the required values to transfer money between your accounts. " +
                     "Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
             return "FAIL";
         }
 
-        //Get amount
-        Double amount = Double.valueOf(parsedInput[1]);
-
+        if(!InputValidator.isNumeric(amountx)) return "FAIL: Invalid amount.";
+        
+        Double amount = Double.parseDouble(amountx);
         //Get the 'from' account
-        Account from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
+        Account from = mapOfAccountNamesToAccounts.get(from_account);
         if(from == null){
-            System.out.println("Provided 'from' account does not exist, please check your input and try again.");
-            return "FAIL";
+            return "FAIL: Provided 'from' account does not exist, please check your input and try again.\n";
         }
 
         //Get the 'to' account
-        Account to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
+        Account to = mapOfAccountNamesToAccounts.get(to_account);
         if(to == null){
-            System.out.println("Provided 'to' account does not exist, please check your input and try again.");
-            return "FAIL";
+            return "FAIL: Provided 'to' account does not exist, please check your input and try again.\n";
         }
 
         //Check if the 'from' account has sufficient balance for the money move
         if(from.getOpeningBalance() < amount){
-            System.out.println("This action is invalid, as this account does not have a sufficient balance.");
-            return "FAIL";
+            return "FAIL: This action is invalid, as this account does not have a sufficient balance.";
         } else {
             from.setOpeningBalance(from.getOpeningBalance() - amount);
             to.setOpeningBalance(to.getOpeningBalance() + amount);
-            System.out.println("From Account:" + from.toString());
-            System.out.println("To Account:" + to.toString());
-            return "SUCCESS";
+            return "SUCCESS: " + "From Account: " + from.toString() + " " + "To Account:" + to.toString() + "\n" ; 
         }
     }
 
-    private String[] parseString(String inputString){
-        return inputString.split(" ");
-    }
+	public String registerNewCustomer(Map<Parameter,String> properties) {
+		
+		String firstname = properties.get(Parameter.FIRSTNAME);
+		String surname = properties.get(Parameter.SURNAME);
+		String newPassword = properties.get(Parameter.NEW_PASSWORD);
+		String confirmPassword = properties.get(Parameter.CONFIRM_PASSWORD);
+		String dob = properties.get(Parameter.DOB);
+		String email = properties.get(Parameter.EMAIL);
+		String address = properties.get(Parameter.ADDRESS);
+		
+		if (InputValidator.parseDate(dob, "d MM yyyy")==null) return "FAIL: Invalid Date of Birth.";
+		if (!(newPassword.equals(confirmPassword))) return "FAIL: Password mismatch." + newPassword + " " + confirmPassword;
+		if (!InputValidator.isEmailAddressValid(email)) return "FAIL: Invalid email address.";
+		if (!InputValidator.validateTextLength(address,4, -1))return "FAIL: Invalid address length.";
+		
+		Customer customer = new Customer(firstname, surname);
+		customer.setDob(InputValidator.parseDate(dob, "d MM yyyy"));
+		customer.setEmail(email);
+		customer.setAddress(address);
 
+		customers.put(customer.getCustomerID(), customer);
+		return "SUCCESS";
+	}
 }
