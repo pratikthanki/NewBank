@@ -17,12 +17,6 @@ public class Customer {
         accounts = new ArrayList<>();
     }
     
-	//Constructor 2: Create customer while providing CustomerID
-	/*
-	 * public Customer(CustomerID customerID) { this(); //Customer() this.customerID
-	 * = customerID; }
-	 */
-    
     public Customer(String firstname, String surname) {
     	this(); 
         this.customerID = new CustomerID(firstname);
@@ -95,5 +89,4 @@ public class Customer {
 		
 		return buffer.toString();
 	}
-	
 }
