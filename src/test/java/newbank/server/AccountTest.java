@@ -1,9 +1,7 @@
 package newbank.server;
 
-import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

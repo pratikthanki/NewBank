@@ -1,8 +1,5 @@
 package newbank.server;
 
-import newbank.server.authentication.BasicAuthenticator;
-
-import java.net.Authenticator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +25,8 @@ public class Customer {
 		this.customerID = customerID;
 	}
 
-	public String getCustomerID() {
-		return customerID.getKey();
+	public CustomerID getCustomerID() {
+		return customerID;
 	}
 
 	public ArrayList<Account> getAccounts() {
