@@ -8,12 +8,13 @@ import java.net.Socket;
 import java.util.*;
 
 public class NewBankClientHandler extends Thread {
-    private final NewBank bank;
-    private final BufferedReader in;
-    private final PrintWriter out;
+
+    private NewBank bank;
+    private BufferedReader in ;
+    private PrintWriter out;
 
     public NewBankClientHandler(Socket s) throws IOException {
-        bank = NewBank.getBank();
+        bank = NewBank.getBank(); 
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
     }

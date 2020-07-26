@@ -1,7 +1,5 @@
 package newbank.client;
 
-import newbank.server.authentication.BasicAuthenticator;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class ExampleClient extends Thread {
+public class ExampleClient extends Thread{
 
     private Socket server;
     private PrintWriter bankServerOut;
@@ -17,13 +15,12 @@ public class ExampleClient extends Thread {
     private Thread bankServerResponceThread;
 
     public ExampleClient(String ip, int port) throws UnknownHostException, IOException {
-        server = new Socket(ip, port);
+        server = new Socket(ip,port);
         userInput = new BufferedReader(new InputStreamReader(System.in));
         bankServerOut = new PrintWriter(server.getOutputStream(), true);
 
         bankServerResponceThread = new Thread() {
             private BufferedReader bankServerIn = new BufferedReader(new InputStreamReader(server.getInputStream()));
-
             public void run() {
             	String responce;
                 try {
@@ -41,9 +38,9 @@ public class ExampleClient extends Thread {
 
 
     public void run() {
-        while (true) {
+        while(true) {
             try {
-                while (true) {
+                while(true) {
                     String command = userInput.readLine();
                     bankServerOut.println(command);
                 }
@@ -55,6 +52,6 @@ public class ExampleClient extends Thread {
     }
 
     public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
-        new ExampleClient("localhost", 14002).start();
+        new ExampleClient("localhost",14002).start();
     }
 }

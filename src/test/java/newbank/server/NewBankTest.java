@@ -1,15 +1,24 @@
 package newbank.server;
 
-import org.junit.Test;
+import newbank.server.StaticData.AccountsData;
+import org.junit.*;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class NewBankTest {
-    NewBank newBank = NewBank.getBank();
-    CustomerID customerID = new CustomerID("John");
-    CustomerID bhagy = new CustomerID("Bhagy");
+    NewBank newBank;
+    CustomerID john;
+    CustomerID bhagy;
+
+    @Before
+    public void SetUp() {
+        newBank = NewBank.getBank();
+        john = new CustomerID("John");
+        bhagy = new CustomerID("Bhagy");
+    }
 
     @Test
     public void getBank() {
@@ -27,67 +36,147 @@ public class NewBankTest {
     @Test
     public void checkLogInDetailsSuccess() {
         String username = "John";
-        String password = "somePassword";
+        String password = "MyPa55w0rd";
         try{
             newBank.checkLogInDetails(username, password);
             assertTrue(true);
         } catch (Exception e){
-            assertTrue(false);
+            fail();
         }
     }
 
     @Test
     public void processRequestFail() {
-    	//Map<Parameter, String> properties = new HashMap<>();
         String expected = "FAIL";
-        assertEquals(expected, newBank.processRequest(customerID, Command.VIEWCASHBACK));
+        assertEquals(expected, newBank.processRequest(john, Command.VIEWCASHBACK));
     }
 
     @Test
     public void processRequestSuccess() {
         String expected = "Main: 1000.0";
-        assertEquals(expected, newBank.processRequest(bhagy, "SHOWMYACCOUNTS"));
+        assertEquals(expected, newBank.processRequest(bhagy, Command.SHOWMYACCOUNTS));
     }
 
     @Test
     public void moveMoneyBetweenAccountsSuccess(){
-    	//HashMap<>
-        String result = newBank.processRequest(customerID, "MOVE 50 Checking Savings");
+		Map<Parameter, String> properties = new HashMap<>();
+		
+		properties.put(Parameter.AMOUNT, "50");
+		properties.put(Parameter.FROM_ACCOUNT, "Checking");
+		properties.put(Parameter.TO_ACCOUNT, "Savings");
+		String result = newBank.processRequest(john,Command.MOVE, properties);
 
-        assertEquals("SUCCESS", result);
+        assertEquals(AccountsData.success, result);
     }
 
     @Test
     public void moveMoneyBetweenAccountsFailed(){
-        String missingArgument = newBank.processRequest(customerID, "MOVE 100 Checking");
+    	Map<Parameter, String> properties = new HashMap<>();
+		
+		properties.put(Parameter.AMOUNT, "50");
+		properties.put(Parameter.FROM_ACCOUNT, "Checking0");
+		
+        String missingArgument = newBank.processRequest(john,Command.MOVE, properties);
 
-        assertEquals("FAIL", missingArgument);
+        assertEquals(AccountsData.fail, missingArgument);
+        
+        properties.clear();
+        properties.put(Parameter.AMOUNT, "1000");
+		properties.put(Parameter.FROM_ACCOUNT, "Checking");
+		properties.put(Parameter.TO_ACCOUNT, "Savings");
+        String invalidAmount = newBank.processRequest(john,Command.MOVE, properties);
 
-        String invalidAmount = newBank.processRequest(customerID, "MOVE 1000 Checking Savings");
+        assertEquals(AccountsData.fail, invalidAmount);
+        
+        properties.clear();
+        properties.put(Parameter.AMOUNT, "50");
+		properties.put(Parameter.FROM_ACCOUNT, "Check");
+		properties.put(Parameter.TO_ACCOUNT, "Savings");
+        String invalidFromAccount = newBank.processRequest(john,Command.MOVE, properties);
 
-        assertEquals("FAIL", invalidAmount);
+        assertEquals(AccountsData.fail, invalidFromAccount);
+        
+        properties.clear();
+        properties.put(Parameter.AMOUNT, "50");
+		properties.put(Parameter.FROM_ACCOUNT, "Checking");
+		properties.put(Parameter.TO_ACCOUNT, "Save");
+        String invalidToAccount = newBank.processRequest(john,Command.MOVE, properties);
 
-        String invalidFromAccount = newBank.processRequest(customerID, "MOVE 50 Check Savings");
+        assertEquals(AccountsData.fail, invalidToAccount);
+    }
 
-        assertEquals("FAIL", invalidFromAccount);
+    @Test
+    public void payMoneyBetweenCustomers(){
+    	Map<Parameter, String> properties = new HashMap<>();
+    	
+		properties.put(Parameter.AMOUNT, "100");
+		properties.put(Parameter.PAYEE_CUSTOMER_NAME, "John");
+		properties.put(Parameter.FROM_ACCOUNT, "Main");
+		
+        String argument = newBank.processRequest(bhagy,Command.PAY, properties);
+        assertEquals(AccountsData.a900, newBank.processRequest(bhagy, Command.SHOWMYACCOUNTS, properties).substring(6));
+        assertEquals(AccountsData.a350, newBank.processRequest(john, Command.SHOWMYACCOUNTS, properties).substring(10, 15));
+        assertEquals(AccountsData.success, argument);
+        
+        properties.clear();
+        properties.put(Parameter.AMOUNT, "100");
+		properties.put(Parameter.PAYEE_CUSTOMER_NAME, "Bhagy");
+		properties.put(Parameter.FROM_ACCOUNT, "Checking");
+		
+        String argument1 = newBank.processRequest(john,Command.PAY, properties);
+        assertEquals(AccountsData.a1000, newBank.processRequest(john, Command.SHOWMYACCOUNTS, properties).substring(6));
+        assertEquals(AccountsData.a250, newBank.processRequest(john, Command.SHOWMYACCOUNTS).substring(10, 15));
+        assertEquals(AccountsData.success, argument1);
+    }
 
-        String invalidToAccount = newBank.processRequest(customerID, "MOVE 50 Checking Save");
+    @Test
+    public void payMoneyBetweenCustomersFailed(){
+    	Map<Parameter, String> properties = new HashMap<>();
+    	
+		properties.put(Parameter.AMOUNT, "100");
+		properties.put(Parameter.PAYEE_CUSTOMER_NAME, "test");
+		properties.put(Parameter.FROM_ACCOUNT, "Main");
+        //Customer does not exist
+        String argument = newBank.processRequest(bhagy, Command.PAY, properties);
+        assertEquals(AccountsData.a1000, newBank.processRequest(bhagy, Command.SHOWMYACCOUNTS).substring(6));
+        assertEquals(AccountsData.a250, newBank.processRequest(john, Command.SHOWMYACCOUNTS).substring(10, 15));
+        assertEquals(AccountsData.fail, argument);
 
-        assertEquals("FAIL", invalidToAccount);
+        //Customer account does not exist
+        properties.clear();
+        properties.put(Parameter.AMOUNT, "100");
+		properties.put(Parameter.PAYEE_CUSTOMER_NAME, "John");
+		properties.put(Parameter.FROM_ACCOUNT, "Main1");
+        String argument1 = newBank.processRequest(bhagy, Command.PAY, properties);
+        assertEquals(AccountsData.a1000, newBank.processRequest(bhagy, Command.SHOWMYACCOUNTS).substring(6));
+        assertEquals(AccountsData.a250, newBank.processRequest(john, Command.SHOWMYACCOUNTS).substring(10, 15));
+        assertEquals(AccountsData.fail, argument1);
+
+        //Invalid amount
+        properties.clear();
+        properties.put(Parameter.AMOUNT, "100a");
+		properties.put(Parameter.PAYEE_CUSTOMER_NAME, "John");
+		properties.put(Parameter.FROM_ACCOUNT, "Main");
+        String argument2 = newBank.processRequest(bhagy, Command.PAY, properties); 
+        assertEquals(AccountsData.a1000, newBank.processRequest(bhagy, Command.SHOWMYACCOUNTS).substring(6));
+        assertEquals(AccountsData.a250, newBank.processRequest(john, Command.SHOWMYACCOUNTS).substring(10, 15));
+        assertEquals(AccountsData.fail, argument2);
     }
 
     @Test
     public void createNewAccount(){
         String newAccountName = "Savings";
         String expectedResult = "SUCCESS";
-
-        assertEquals(expectedResult, newBank.processRequest(customerID, "NEWACCOUNT "+newAccountName));
-        assertTrue(newBank.processRequest(customerID, "SHOWMYACCOUNTS").contains(newAccountName+": 0.0"));
-
+        
+        Map<Parameter, String> properties = new HashMap<>();
+    	
+		properties.put(Parameter.ACCOUNT_NAME, newAccountName);
+        assertEquals(expectedResult, newBank.processRequest(john, Command.NEWACCOUNT, properties)); //newAccountName));
+        assertTrue(newBank.processRequest(john, Command.SHOWMYACCOUNTS).contains(newAccountName + ": 0.0"));
     }
 
     @Test
     public void createNewAccountWithoutAccountName(){
-        assertEquals("FAIL", newBank.processRequest(customerID, "NEWACCOUNT"));
+        assertEquals(AccountsData.fail, newBank.processRequest(john, Command.NEWACCOUNT));
     }
 }

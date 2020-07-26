@@ -1,20 +1,20 @@
 package newbank.server;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class CustomerIDTest extends TestCase {
+public class CustomerIDTest {
     CustomerID customerID;
 
     @Test
     public void testGetKey() {
         customerID = new CustomerID("123XYZ");
-        assertEquals("123XYZ", customerID.getKey());
+        Assert.assertEquals("123XYZ", customerID.getKey());
     }
 
     @Test
     public void testGetKeyNull() {
         customerID = new CustomerID(null);
-        assertNull(customerID.getKey());
+        Assert.assertNull(customerID.getKey());
     }
 }

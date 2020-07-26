@@ -2,6 +2,7 @@ package newbank.server;
 
 import newbank.database.DatabaseClient;
 import newbank.server.authentication.BasicAuthenticator;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +30,25 @@ public class NewBank {
         basicAuthenticator = new BasicAuthenticator(userName, password);
 
         return basicAuthenticator.ValidateLogin();
+    }
+
+    // commands from the NewBank customer are processed in this method
+    public synchronized String processRequest(CustomerID customerID, String request) {
+        if (customers.containsKey(customerID.getKey())) {
+            switch (parseString(request)[0]) {
+                case "SHOWMYACCOUNTS":
+                    return showMyAccounts(customerID);
+                case "NEWACCOUNT":
+                    return createNewAccount(customerID, request);
+                case "MOVE":
+                    return moveMoney(customerID, request);
+                case "PAY":
+                    return payMoney(customerID, request);
+                default:
+                    return "FAIL";
+            }
+        }
+        return "FAIL";
     }
     
     public synchronized String processRequest(CustomerID customer, Command command) {
@@ -109,10 +129,9 @@ public class NewBank {
         
         List<Account> accountsAssociatedToCustomer = c.getAccounts();
         Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
-        for (Account a : accountsAssociatedToCustomer) {
+        for(Account a: accountsAssociatedToCustomer){
             mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
         }
-
         if(properties.size() != 3){
             System.out.println("You have not provided all the required values to transfer money between your accounts. " +
                     "Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
@@ -123,7 +142,6 @@ public class NewBank {
         
         Double amount = Double.parseDouble(amountx);
         //Get the 'from' account
-
         Account from = mapOfAccountNamesToAccounts.get(from_account);
         if(from == null){
             return "FAIL: Provided 'from' account does not exist, please check your input and try again.\n";
@@ -132,7 +150,7 @@ public class NewBank {
         //Get the 'to' account
         Account to = mapOfAccountNamesToAccounts.get(to_account);
         if(to == null){
-            return "FAIL";
+            return "FAIL: Provided 'to' account does not exist, please check your input and try again.\n";
         }
 
       //Check if the 'from' account has sufficient balance for the money move
@@ -148,6 +166,11 @@ public class NewBank {
         }
     }
 
+    //pay another person
+    private String payMoney(CustomerID customerID, String request) {
+       return "FAIL";
+    }
+    
     //pay another person
     private String payMoney(CustomerID customer, Command command, Map<Parameter, String> properties) {
         
@@ -264,7 +287,11 @@ public class NewBank {
 		customer.setEmail(email);
 		customer.setAddress(address);
 
-		customers.put(customer.getCustomerID().getKey(), customer);
+		customers.put(customer.getCustomerID(), customer);
 		return "SUCCESS";
 	}
+	
+    private String[] parseString(String inputString) {
+        return inputString.split(" ");
+    }
 }

@@ -25,7 +25,6 @@ public class Customer {
 		this(); //Customer()
 		this.customerID = customerID;
 	}
-
 	//Contructor 3
 	public Customer(String firstname, String surname) {
 	    	this(); 
@@ -33,8 +32,8 @@ public class Customer {
 	        this.name = firstname + " " + surname;
 	 }
 
-	public CustomerID getCustomerID() {
-		return customerID;
+	public String getCustomerID() {
+		return customerID.getKey();
 	}
 
 	public ArrayList<Account> getAccounts() {

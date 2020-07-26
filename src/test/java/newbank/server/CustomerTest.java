@@ -1,60 +1,58 @@
 package newbank.server;
 
-import junit.framework.TestCase;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
-
-public class CustomerTest extends TestCase {
-    Account accountName;
-    Customer customerName;
     
+import static org.junit.Assert.*;
+
+public class CustomerTest {
+    Account savings;
+    Account isa;
+    Customer customer;
 
     @Before
     public void setUp() {
-        accountName = new Account("savings", 123);
-        customerName = new Customer();
-        customerName.addAccount(accountName);
+        savings = new Account("savings", 123, 1234);
+        customer = new Customer();
+        customer.addAccount(savings);
         
-        customerName.setEmail("test@gmail.com");
-        customerName.setAddress("6 Osapa, Lagos, Nigeria");
-        customerName.setName("Peter Test");
+        customer.setEmail("test@gmail.com");
+        customer.setAddress("6 Osapa, Lagos, Nigeria");
+        customer.setName("Peter Test");
+        
         try {
-			customerName.setDob(new SimpleDateFormat("d M yyyy").parse("2 8 1912"));
+        	customer.setDob(new SimpleDateFormat("d M yyyy").parse("2 8 1912"));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-        
     }
 
     @Test
     public void testAccountsToString() {
-        Assert.assertEquals("savings: 123.0", customerName.accountsToString());
+        assertEquals("savings: 123.0", customer.accountsToString());
     }
     
     @Test
     public void testSetEmail() {
-        Assert.assertEquals("test@gmail.com", customerName.getEmail());
+    	assertEquals("test@gmail.com", customer.getEmail());
     }
     
     @Test
     public void testSetAddress() {
-        Assert.assertEquals("6 Osapa, Lagos, Nigeria", customerName.getAddress());
+        assertEquals("6 Osapa, Lagos, Nigeria", customer.getAddress());
     }
     
     @Test
     public void testSetName() {
-        Assert.assertEquals("Peter Test", customerName.getName());
+       assertEquals("Peter Test", customer.getName());
     }
     
     @Test
     public void testSetDob() {
         try {
-			Assert.assertEquals(new SimpleDateFormat("d M yyyy").parse("2 8 1912"), customerName.getDob());
+			assertEquals(new SimpleDateFormat("d M yyyy").parse("2 8 1912"), customer.getDob());
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -65,23 +63,33 @@ public class CustomerTest extends TestCase {
     @Test
     public void testAddAccount() {
         try {
-            Account isa = new Account("isa", 123);
-            customerName.addAccount(isa);
-
-            Assert.assertTrue(true);
-            Assert.assertNotNull(customerName);
+            Account checkings = new Account("checkings", 123, 1234);
+            assertTrue(true);
+            assertFalse(checkings.isDefaultAccount());
         }
         catch(Exception e) {
-            Assert.fail();
+            fail();
+        }
+    }
+
+    @Test
+    public void testAddTwoAccounts() {
+        try {
+            isa = new Account("isa", 123, 1234);
+            assertTrue(true);
+            assertTrue(savings.isDefaultAccount());
+            assertFalse(isa.isDefaultAccount());
+
+        }
+        catch(Exception e) {
+            fail();
         }
     }
 
     @Test
     public void testGetAllAccounts(){
-        List<Account> accountList = customerName.getAccounts();
-
-        assertEquals(1, accountList.size());
-        assertEquals("savings", accountList.get(0).getAccountName());
-        assertEquals(123.0, accountList.get(0).getBalance());
+        assertEquals(1, customer.getNumberOfAccounts());
+        assertEquals("savings", savings.getAccountName());
+        assertEquals(123.0, savings.getBalance(),0);
     }
 }
