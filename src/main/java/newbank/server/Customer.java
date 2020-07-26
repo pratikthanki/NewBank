@@ -28,8 +28,8 @@ public class Customer {
 		this.customerID = customerID;
 	}
 
-	public String getCustomerID() {
-		return customerID.getKey();
+	public CustomerID getCustomerID() {
+		return customerID;
 	}
 
 	public ArrayList<Account> getAccounts() {
