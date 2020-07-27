@@ -16,12 +16,6 @@ public class NewBankData {
     public final static String pay = "PAY";
     public final static String customerDetail = "CUSTOMERDETAIL";
 
-    //Command syntax
-    public static String moveWrongSyntaxMessage = "You have not provided all the required values to transfer money between your accounts. " +
-            "Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>";
-    public static String payWrongSyntaxMessage = "You have not provided all the required values to PAY money to another customer " +
-            "Please provide the request in the following format: PAY <CustomerName> <Amount> <AccountFrom>";
-
     //User interactions messages:
     public static String enterUsername = "Enter Username";
     public static String enterPassword = "Enter Password";

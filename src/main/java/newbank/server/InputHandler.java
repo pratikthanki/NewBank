@@ -58,10 +58,15 @@ public class InputHandler {
 
         recipient = verifyCustomer(out, in , bank);
         amount = verifyAmount(out, in );
+        Double dAmount = Double.valueOf(amount);
         fromAccount = verifyFromAccount(out, in , customerID, bank);
 
-        String response = bank.processRequest(customerID, pay + emptyString + recipient + emptyString + amount + emptyString + fromAccount);
-        out.println(response);
+        if (!verifyPayerSufficientBalance(out, customerID, bank, dAmount, fromAccount)) {
+            out.println(accountLabel + fromAccount + insufficientBalanceMessage);
+        } else {
+            String response = bank.processRequest(customerID, pay + emptyString + recipient + emptyString + amount + emptyString + fromAccount);
+            out.println(response);
+        }
     }
 
     public void getCustomerDetails(PrintWriter out, CustomerID customerID, NewBank bank) {
