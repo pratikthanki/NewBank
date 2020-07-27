@@ -4,8 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-
 import static newbank.database.static_data.NewBankData.*;
+import static newbank.server.MenuHandler.*;
 
 public class InputHandler {
 
@@ -17,7 +17,7 @@ public class InputHandler {
 
     public void showMyAccounts(PrintWriter out, CustomerID customerID, NewBank bank) {
         out.println(requestFrom + customerID.getKey());
-        String response = bank.processRequest(customerID, showMyAccounts);
+        String response = bank.processRequest(customerID, ShowMyAccounts.getMenuOption());
         out.println(response);
     }
 
@@ -25,7 +25,7 @@ public class InputHandler {
         String newAccountName;
         out.println(requestFrom + customerID.getKey());
         newAccountName = verifyNewAccountName(out, in );
-        String response2 = bank.processRequest(customerID, newAccount.trim() + emptyString + newAccountName);
+        String response2 = bank.processRequest(customerID, NewAccount.getMenuOption() + emptyString + newAccountName);
         out.println(response2);
     }
 
@@ -43,7 +43,7 @@ public class InputHandler {
         if (!verifyPayerSufficientBalance(out, customerID, bank, dAmount, from)) {
             out.println(accountLabel + from + insufficientBalanceMessage);
         } else {
-            String response = bank.processRequest(customerID, move + emptyString + amount + emptyString + from + emptyString + to);
+            String response = bank.processRequest(customerID, Move.getMenuOption() + emptyString + amount + emptyString + from + emptyString + to);
             out.println(response);
         }
     }
@@ -64,7 +64,7 @@ public class InputHandler {
         if (!verifyPayerSufficientBalance(out, customerID, bank, dAmount, fromAccount)) {
             out.println(accountLabel + fromAccount + insufficientBalanceMessage);
         } else {
-            String response = bank.processRequest(customerID, pay + emptyString + recipient + emptyString + amount + emptyString + fromAccount);
+            String response = bank.processRequest(customerID, Pay.getMenuOption() + emptyString + recipient + emptyString + amount + emptyString + fromAccount);
             out.println(response);
         }
     }
@@ -73,7 +73,7 @@ public class InputHandler {
         out.println(retrievingCustomerDetails);
         out.println(customerDetailsMessage);
         out.println(lineSeparator);
-        out.println(bank.processRequest(customerID, customerDetail));
+        out.println(bank.processRequest(customerID, CustomerDetails.getMenuOption()));
         out.println(lineSeparator);
         out.println(done);
     }

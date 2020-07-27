@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import static newbank.database.static_data.NewBankData.*;
+import static newbank.server.MenuHandler.*;
 
 public class NewBankClientHandler extends Thread {
 
@@ -59,36 +60,34 @@ public class NewBankClientHandler extends Thread {
 //                }
     }
 
-
     private void handleUserCommands(CustomerID customerID) throws IOException {
         String menuItem;
         do {
-            iPaymentHelper.processMenuSelection(out);
+            processMenuSelection(out);
             out.println(selectOption);
             menuItem = in.readLine();
-
-            switch (menuItem) {
-                case enumIdOne:
-                    inputHandler.showMyAccounts(out, customerID, bank);
-                    break;
-                case enumIdTwo:
-                    inputHandler.newAccount(in, out, customerID, bank);
-                    break;
-                case enumIdThree:
-                    inputHandler.moveMoneyBetweenAccounts(in,out, customerID, bank);
-                    break;
-                case enumIdFour:
-                    inputHandler.payMoneyToCustomer(in, out, customerID, bank);
-                    break;
-                case enumIdFive:
-                    inputHandler.getCustomerDetails(out, customerID, bank);
-                    break;
-                case enumIdNine:
-                    out.println(bye);
-                    break;
-                default:
-                    out.println(invalidChoice);
-            }
+                switch (menuItem) {
+                    case enumIdOne:
+                        inputHandler.showMyAccounts(out, customerID, bank);
+                        break;
+                    case enumIdTwo:
+                        inputHandler.newAccount(in, out, customerID, bank);
+                        break;
+                    case enumIdThree:
+                        inputHandler.moveMoneyBetweenAccounts(in, out, customerID, bank);
+                        break;
+                    case enumIdFour:
+                        inputHandler.payMoneyToCustomer(in, out, customerID, bank);
+                        break;
+                    case enumIdFive:
+                        inputHandler.getCustomerDetails(out, customerID, bank);
+                        break;
+                    case enumIdNine:
+                        out.println(bye);
+                        break;
+                    default:
+                        out.println(invalidChoice);
+                }
         } while (!menuItem.equals(enumIdNine));
     }
 }

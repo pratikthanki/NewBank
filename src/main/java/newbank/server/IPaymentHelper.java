@@ -1,8 +1,6 @@
 package newbank.server;
 
 import java.io.PrintWriter;
-import java.util.HashMap;
-import static newbank.database.static_data.NewBankData.*;
 
 public class IPaymentHelper implements IPayment {
 
@@ -30,26 +28,5 @@ public class IPaymentHelper implements IPayment {
     public Boolean checkAccountHasSufficientBalance(PrintWriter out, Account from, Double amount) {
         //execute transaction
         return !(from.getBalance() < amount);
-    }
-
-    public void processMenuSelection(PrintWriter out) {
-        // Print values
-        int count = 0;
-        for (String key : getMainMenu().values()) {
-            count++;
-            out.println(count + ".\t" + key);
-        }
-        out.println(enumIdNine + quit);
-    }
-
-    private HashMap<String, String> getMainMenu() {
-        //Menu options and requests
-        HashMap<String, String> menuOptions = new HashMap<>();
-        menuOptions.put(enumIdOne, showMyAccounts);
-        menuOptions.put(enumIdTwo, newAccount);
-        menuOptions.put(enumIdThree, move);
-        menuOptions.put(enumIdFour, pay);
-        menuOptions.put(enumIdFive, customerDetail);
-        return menuOptions;
     }
 }

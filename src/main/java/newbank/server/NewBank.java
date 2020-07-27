@@ -47,10 +47,10 @@ public class NewBank {
                 case customerDetail:
                     return getCustomer(customerID, request).getDetail();
                 default:
-                    return Statuses.FAIL.toString();
+                    return Status.FAIL.toString();
             }
         }
-        return Statuses.FAIL.toString();
+        return Status.FAIL.toString();
     }
 
     private Customer getCustomer(CustomerID customer, String request) {
@@ -65,9 +65,9 @@ public class NewBank {
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
             customers.get(customerID.getKey()).addAccount(new Account(newAccountName, 0.0, 1234));
-            return Statuses.SUCCESS.toString();
+            return Status.SUCCESS.toString();
         }
-        return Statuses.FAIL.toString();
+        return Status.FAIL.toString();
     }
 
     private String showMyAccounts(CustomerID customer) {
@@ -93,7 +93,7 @@ public class NewBank {
 
         //Calculate transaction
         paymentHelper.calculateTransaction(from, to, amount);
-        return Statuses.SUCCESS.toString();
+        return Status.SUCCESS.toString();
     }
 
     //pay another person
@@ -121,7 +121,7 @@ public class NewBank {
 
         //Calculate transaction
         paymentHelper.calculateTransaction(from, to, amount);
-        return Statuses.SUCCESS.toString();
+        return Status.SUCCESS.toString();
     }
 
     private String[] parseString(String inputString) {
