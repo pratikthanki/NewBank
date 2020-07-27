@@ -180,19 +180,19 @@ public class InputHandler {
     }
 
     private String verifyNewAccountName(PrintWriter out, BufferedReader in ) {
-        String newAccountName = "";
+        String newAccount = "";
 
-        out.println(newAccount);
+        out.println(newAccountName);
         while (true) {
             try {
-               newAccountName = in.readLine();
+               newAccount = in.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (!isValidName(newAccountName)) {
-                out.println(newAccountName + invalidAccountNameCharacters);
+            if (!isValidName(newAccount)) {
+                out.println(newAccount + invalidAccountNameCharacters);
             } else {
-                return newAccountName;
+                return newAccount;
             }
         }
     }

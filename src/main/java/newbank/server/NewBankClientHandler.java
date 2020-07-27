@@ -66,28 +66,29 @@ public class NewBankClientHandler extends Thread {
             iPaymentHelper.processMenuSelection(out);
             out.println(selectOption);
             menuItem = in.readLine();
+
             switch (menuItem) {
-                case one:
+                case enumIdOne:
                     inputHandler.showMyAccounts(out, customerID, bank);
                     break;
-                case two:
+                case enumIdTwo:
                     inputHandler.newAccount(in, out, customerID, bank);
                     break;
-                case three:
+                case enumIdThree:
                     inputHandler.moveMoneyBetweenAccounts(in,out, customerID, bank);
                     break;
-                case four:
+                case enumIdFour:
                     inputHandler.payMoneyToCustomer(in, out, customerID, bank);
                     break;
-                case five:
+                case enumIdFive:
                     inputHandler.getCustomerDetails(out, customerID, bank);
                     break;
-                case nine:
+                case enumIdNine:
                     out.println(bye);
                     break;
                 default:
                     out.println(invalidChoice);
             }
-        } while (!menuItem.equals(nine));
+        } while (!menuItem.equals(enumIdNine));
     }
 }

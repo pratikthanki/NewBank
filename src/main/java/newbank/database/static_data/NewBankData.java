@@ -44,27 +44,16 @@ public class NewBankData {
     public static String accountNotFound = " is not a valid account. Please try again:";
     public static String customerNotFound = " is not a member of New Bank. Please try again:";
 
-
-
-
-
-
-
-
-
-
-
-
     //IDs
-    public final static String one = "1";
-    public final static String two = "2";
-    public final static String three = "3";
-    public final static String four = "4";
-    public final static String five = "5";
-    public final static String six = "6";
-    public final static String seven = "7";
-    public final static String eight = "8";
-    public final static String nine = "9";
-    public final static String ten = "10";
+    public final static String enumIdOne = "1";
+    public final static String enumIdTwo = "2";
+    public final static String enumIdThree = "3";
+    public final static String enumIdFour = "4";
+    public final static String enumIdFive = "5";
+    public final static String enumIdSix = "6";
+    public final static String enumIdSeven = "7";
+    public final static String enumIdEight = "8";
+    public final static String enumIdNine = "9";
+    public final static String enumIdTen = "10";
 
 }
