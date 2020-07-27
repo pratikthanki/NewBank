@@ -45,7 +45,7 @@ public abstract class NewBankData {
     public static String customerDetailsMessage = "CUSTOMER DETAIL";
     public static String lineSeparator = "----------------------";
     public static String bye = "Bye-bye!";
-    public static String quit = ".\tQuit";
+    public static String quit = "Quit";
     public static String done = "Done.";
     public static String invalidChoice = "Invalid choice.";
     public static String emptyString = " ";

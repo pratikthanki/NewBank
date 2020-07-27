@@ -2,13 +2,15 @@ package newbank.server;
 
 import java.io.PrintWriter;
 
-    public enum MainMenu {
-        ShowMyAccounts("1", "SHOWMYACCOUNTS"),
-        NewAccount("2", "NEWACCOUNT"),
-        Move("3", "MOVE"),
-        Pay("4","PAY"),
-        CustomerDetails("5", "CUSTOMERDETAILS"),
-        Quit("9", "QUIT");
+import static newbank.database.static_data.NewBankData.*;
+
+public enum MainMenu {
+        ShowMyAccounts(enumIdOne, showMyAccounts),
+        NewAccount(enumIdTwo, newAccount),
+        Move(enumIdThree, move),
+        Pay(enumIdFour,pay),
+        CustomerDetails(enumIdFive, customerDetail),
+        Quit(enumIdNine, quit);
 
         private final String menuOptionId;
         private final String menuOption;
