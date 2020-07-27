@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import static newbank.database.static_data.NewBankData.*;
-import static newbank.server.MenuHandler.*;
+import static newbank.server.MainMenu.*;
 
 public class NewBankClientHandler extends Thread {
 
@@ -15,7 +15,6 @@ public class NewBankClientHandler extends Thread {
     private final BufferedReader in;
     private final PrintWriter out;
 
-    IPaymentHelper iPaymentHelper = new IPaymentHelper();
     InputHandler inputHandler = new InputHandler();
 
     public NewBankClientHandler(Socket s) throws IOException {

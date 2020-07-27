@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import static newbank.database.static_data.NewBankData.*;
-import static newbank.server.MenuHandler.*;
+import static newbank.server.MainMenu.*;
 
 public class InputHandler {
 
