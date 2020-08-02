@@ -1,6 +1,6 @@
 package newbank.server.accounts;
 
-import com.sun.jdi.request.InvalidRequestStateException;
+import newbank.exceptions.InsufficientFundsException;
 import newbank.server.NewBank;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class CreditCardAccountTest {
     }
 
     @Test
-    public void testPurchaseOnCredit() {
+    public void testPurchaseOnCredit() throws InsufficientFundsException {
         creditCardAccount = new CreditCardAccount("Credit Card", 100.0, 1234, 1.5);
 
         double balance = creditCardAccount.purchaseOnCredit(50);
@@ -48,13 +48,13 @@ public class CreditCardAccountTest {
         try {
             creditCardAccount.purchaseOnCredit(150);
             fail("Should have failed, as the cost of the purchase exceeds the credit available.");
-        } catch(InvalidRequestStateException e){
+        } catch(InsufficientFundsException e){
             assertEquals("Invalid request, not sufficient balance to make this purchase.", e.getMessage());
         }
     }
 
     @Test
-    public void testAccrueInterest() {
+    public void testAccrueInterest() throws InsufficientFundsException {
         creditCardAccount = new CreditCardAccount("Credit Card", 100.0, 1234, 1.5);
 
         creditCardAccount.purchaseOnCredit(10);
