@@ -108,6 +108,7 @@
           <execution>
             <id>mutation-coverage</id>
             <!-- Phase to ensure it runs after tests -->
+            <!-- To view reports go to target/pit-reports/<latest folder>/index.html -->
             <phase>prepare-package</phase>
             <goals>
               <goal>mutationCoverage</goal>
