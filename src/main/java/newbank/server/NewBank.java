@@ -2,6 +2,8 @@ package newbank.server;
 
 import newbank.database.DatabaseClient;
 import newbank.server.authentication.BasicAuthenticator;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static newbank.database.static_data.NewBankData.*;
@@ -77,19 +79,25 @@ public class NewBank {
     private String moveMoney(CustomerID customerID, String request) {
         //User input
         String[] parsedInput = parseString(request);
+        if (parsedInput.length != 4) return Status.FAIL.toString();
 
         //customer
         Customer customer = customers.get(customerID.getKey());
 
         //amount
-        String strAmount = parsedInput[1];
-        Double amount = Double.valueOf(strAmount);
+        String userInputAmount = parsedInput[1];
+        if (!validUserAmount(userInputAmount)) return Status.FAIL.toString();
+        Double amount = Double.parseDouble(userInputAmount);
+
+        HashMap<String, Account> customerAccounts = customer.getHasMapForAllCustomerAccounts();
 
         //Get the 'from' account
-        Account from = customer.getHasMapForAllCustomerAccounts().get(parsedInput[2]);
+        Account from = customerAccounts.get(parsedInput[2]);
 
         //Get the 'to' account
-        Account to = customer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
+        Account to = customerAccounts.get(parsedInput[3]);
+
+        if (from == null || to == null) return Status.FAIL.toString();
 
         //Calculate transaction
         paymentHelper.calculateTransaction(from, to, amount);
@@ -100,30 +108,49 @@ public class NewBank {
     private String payMoney(CustomerID customerID, String request) {
         //User input
         String[] parsedInput = parseString(request);
+        if (parsedInput.length != 4) return Status.FAIL.toString();
 
         //payer
         Customer payer = customers.get(customerID.getKey());
+        HashMap<String, Account> payerAccounts = payer.getHasMapForAllCustomerAccounts();
 
         //payee
         String payeeCustomerName = parsedInput[1];
         Customer payee;
         payee = customers.get(payeeCustomerName);
+        if (payee == null) return Status.FAIL.toString();
+
+        HashMap<String, Account> payeeAccounts = payee.getHasMapForAllCustomerAccounts();
+        if (payeeAccounts.size() == 0) return Status.FAIL.toString();
 
         //check if amount is a valid numerical value
-        String strAmount = parsedInput[2];
-        Double amount = Double.valueOf(strAmount);
+        String userInputAmount = parsedInput[2];
+
+        if (!validUserAmount(userInputAmount)) return Status.FAIL.toString();
+        Double amount = Double.parseDouble(userInputAmount);
 
         //Get the 'from' account
-        Account from = payer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
+        Account from = payerAccounts.get(parsedInput[3]);
 
         //Get payee's default account
         Account to = payee.getDefaultAccount();
+
+        if (from == null || to == null) return Status.FAIL.toString();
 
         //Calculate transaction
         paymentHelper.calculateTransaction(from, to, amount);
         return Status.SUCCESS.toString();
     }
 
+    public boolean validUserAmount(final String s) {
+        try {
+            final double move = Double.parseDouble(s);
+            return true;
+        } catch (final NumberFormatException e) {
+            System.out.printf("Error: invalid input \"%s\", please try again.\n", s);
+        }
+        return false;
+    }
     private String[] parseString(String inputString) {
         return inputString.split(emptyString);
     }
