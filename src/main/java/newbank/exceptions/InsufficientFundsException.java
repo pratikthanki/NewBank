@@ -1,10 +1,10 @@
 package newbank.exceptions;
 
-public class InsufficientFundsExceptions extends Exception {
-    public InsufficientFundsExceptions() {
+public class InsufficientFundsException extends Exception {
+    public InsufficientFundsException() {
     }
 
-    public InsufficientFundsExceptions(String message) {
+    public InsufficientFundsException(String message) {
         super(message);
     }
 }
