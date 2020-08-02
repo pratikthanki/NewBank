@@ -1,11 +1,29 @@
 package newbank.server;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "accounts")
 public class Account {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "account_name")
     private String accountName;
+
+    @Column(name = "balance")
     private double balance;
+
+    @Column(name = "default_account_status")
     private boolean defaultAccountStatus;
+
+    @Column(name = "account_pin")
     private int accountPin;
+
+    public Account(){}
 
     public Account(String accountName, double openingBalance, int accountPin) {
         this.accountName = accountName;
@@ -41,6 +59,10 @@ public class Account {
 
     public double getBalance() {
         return balance;
+    }
+
+    public int getId(){
+        return id;
     }
 
     public String toString() {

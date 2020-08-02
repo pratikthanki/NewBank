@@ -1,6 +1,9 @@
 package newbank.server;
 
 import newbank.database.DatabaseClient;
+import newbank.database.HibernateDatabaseClient;
+import newbank.database.HibernateUtility;
+import newbank.database.MapDatabaseClient;
 import newbank.server.authentication.BasicAuthenticator;
 
 import java.util.HashMap;
@@ -9,18 +12,26 @@ import java.util.Map;
 
 public class NewBank {
 
-    private static final NewBank bank = new NewBank();
+    private static NewBank bank;
     private static final IPaymentHelper paymentHelper = new IPaymentHelper();
-    private DatabaseClient databaseClient = new DatabaseClient();
-    private HashMap<String, Customer> customers;
+    private final DatabaseClient databaseClient;
     private BasicAuthenticator basicAuthenticator;
 
-    private NewBank() {
-        customers = databaseClient.getCustomers();
+    private NewBank(DatabaseClient databaseClient) {
+        this.databaseClient = databaseClient;
     }
 
     public static NewBank getBank() {
+        if(bank == null){
+            bank = new NewBank(new HibernateDatabaseClient(HibernateUtility.development()));
+        }
         return bank;
+    }
+
+    public static void init(DatabaseClient databaseClient){
+        if(bank == null){
+            bank = new NewBank(databaseClient);
+        }
     }
 
     public synchronized CustomerID checkLogInDetails(String userName, String password) {
@@ -31,7 +42,7 @@ public class NewBank {
 
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customerID, String request) {
-        if (customers.containsKey(customerID.getKey())) {
+        if (databaseClient.hasCustomer(customerID.getKey())) {
             switch (parseString(request)[0]) {
                 case "SHOWMYACCOUNTS":
                     return showMyAccounts(customerID);
@@ -52,7 +63,7 @@ public class NewBank {
 
     private Customer getCustomer(CustomerID customer, String request) {
         if (request.equals("CUSTOMERDETAIL")) {
-            return customers.get(customer.getKey());
+            return databaseClient.getCustomerById(customer);
         }
         return null;
     }
@@ -61,19 +72,19 @@ public class NewBank {
         String[] requestAndDetails = request.split(" ");
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
-            customers.get(customerID.getKey()).addAccount(new Account(newAccountName, 0.0, 1234));
+            databaseClient.addAccount(customerID, new Account(newAccountName, 0.0, 1234));
             return "SUCCESS";
         }
         return "FAIL";
     }
 
     private String showMyAccounts(CustomerID customer) {
-        return (customers.get(customer.getKey())).accountsToString();
+        return databaseClient.getAccountsAsString(customer);
     }
 
     private String moveMoney(CustomerID customerID, String request) {
         String[] parsedInput = parseString(request);
-        Customer customer = customers.get(customerID.getKey());
+        Customer customer = databaseClient.getCustomerById(customerID);
         List<Account> accountsAssociatedToCustomer = customer.getAccounts();
         Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
         for (Account a : accountsAssociatedToCustomer) {
@@ -120,11 +131,11 @@ public class NewBank {
         String[] parsedInput = parseString(request);
 
         //payer
-        Customer payer = customers.get(customerID.getKey());
+        Customer payer = databaseClient.getCustomerById(customerID);
 
         //check payee customer exists
         String payeeCustomerName = parsedInput[1];
-        Customer payee = customers.get(payeeCustomerName);
+        Customer payee = databaseClient.getCustomerById(payeeCustomerName);
 
         //check user input
         if (parsedInput.length != 4) {
@@ -144,7 +155,7 @@ public class NewBank {
         Account from = payer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
 
         //Get the 'to' account
-        if (!paymentHelper.checkCustomerExists(customers, payeeCustomerName)) {
+        if (!databaseClient.hasCustomer(payeeCustomerName)) {
             return "FAIL";
         }
         Account to = payee.getDefaultAccount();
@@ -158,6 +169,8 @@ public class NewBank {
         if (!paymentHelper.calculateTransaction(from, to, amount)) {
             return "FAIL";
         } else {
+            databaseClient.updateCustomer(payer);
+            databaseClient.updateCustomer(payee);
             return "SUCCESS";
         }
 
