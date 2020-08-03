@@ -1,20 +1,13 @@
 package newbank.server;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class AccountTest {
     Account accountName;
-    NewBank newBank;
 
-    @Before
-    public void SetUp() {
-        newBank = NewBank.getBank();
-
-    }
     @Test
     public void testAddAccount_AllowNull() {
         accountName = new Account(null, 123, 1234);

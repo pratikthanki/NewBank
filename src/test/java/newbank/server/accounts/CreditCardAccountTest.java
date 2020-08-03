@@ -13,12 +13,6 @@ import static org.junit.Assert.fail;
 public class CreditCardAccountTest {
 
     CreditCardAccount creditCardAccount;
-    NewBank newBank;
-
-    @Before
-    public void SetUp() {
-        newBank = NewBank.getBank();
-    }
 
     @Test
     public void testSavingsAccountCreation() {

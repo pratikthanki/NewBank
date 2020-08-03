@@ -14,12 +14,6 @@ import static org.junit.Assert.assertEquals;
 public class SavingsAccountTest {
 
     SavingsAccount savingsAccount;
-    NewBank newBank;
-
-    @Before
-    public void SetUp() {
-        newBank = NewBank.getBank();
-    }
 
     @Test
     public void testSavingsAccountCreation() {

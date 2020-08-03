@@ -9,12 +9,10 @@ import static org.junit.Assert.*;
 public class PaymentHelperTest {
     Account account;
     Account account1;
-    NewBank newBank;
     IPaymentHelper paymentHelper;
 
     @Before
     public void SetUp() {
-        newBank = NewBank.getBank();
         paymentHelper = new IPaymentHelper();
     }
 
