@@ -2,8 +2,11 @@ package newbank.server.accounts;
 
 import com.sun.jdi.request.InvalidRequestStateException;
 import newbank.server.Account;
+import newbank.server.Customer;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreditCardAccount extends Account {
 
@@ -22,7 +25,7 @@ public class CreditCardAccount extends Account {
 
     public double purchaseOnCredit(double price){
         if(getBalance() > price){
-            addMoney(-price);
+            withdrawMoney(price);
         } else {
             throw new InvalidRequestStateException("Invalid request, not sufficient balance to make this purchase.");
         }
@@ -35,9 +38,17 @@ public class CreditCardAccount extends Account {
             double balance = getBalance();
             double moneyOwed = creditLimit - balance;
             double interest = (moneyOwed * interestRate) - moneyOwed;
-            addMoney(-interest);
+            withdrawMoney(interest);
         }
         return getBalance();
+    }
+
+    public void payOffCreditCardBalance(Customer customer, Account account, double amountToPay){
+        List<String> accountNames = customer.getAccounts().stream().map(Account::getAccountName).collect(Collectors.toList());
+        if(accountNames.contains(account.getAccountName()) && accountNames.contains(getAccountName())){
+            account.withdrawMoney(amountToPay);
+            addMoney(amountToPay);
+        }
     }
 
     public double getInterestRate() {
