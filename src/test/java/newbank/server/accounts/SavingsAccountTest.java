@@ -3,8 +3,6 @@ package newbank.server.accounts;
 import newbank.server.Account;
 import newbank.server.Customer;
 import newbank.server.CustomerID;
-import newbank.server.NewBank;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDateTime;

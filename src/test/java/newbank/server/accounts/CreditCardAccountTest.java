@@ -1,6 +1,6 @@
 package newbank.server.accounts;
 
-//import com.sun.jdi.request.InvalidRequestStateException;
+import com.sun.jdi.request.InvalidRequestStateException;
 import newbank.server.NewBank;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class CreditCardAccountTest {
         try {
             creditCardAccount.purchaseOnCredit(150);
             fail("Should have failed, as the cost of the purchase exceeds the credit available.");
-        } catch(Exception e){
+        } catch(InvalidRequestStateException e){
             assertEquals("Invalid request, not sufficient balance to make this purchase.", e.getMessage());
         }
     }

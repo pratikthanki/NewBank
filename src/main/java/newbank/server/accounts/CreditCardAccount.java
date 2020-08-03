@@ -1,6 +1,6 @@
 package newbank.server.accounts;
 
-//import com.sun.jdi.request.InvalidRequestStateException;
+import com.sun.jdi.request.InvalidRequestStateException;
 import newbank.server.Account;
 
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ public class CreditCardAccount extends Account {
         if(getBalance() > price){
             addMoney(-price);
         } else {
-            throw new UnsupportedOperationException("Invalid request, not sufficient balance to make this purchase.");
+            throw new InvalidRequestStateException("Invalid request, not sufficient balance to make this purchase.");
         }
         return getBalance();
     }
