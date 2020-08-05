@@ -96,7 +96,41 @@
             <check />
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.pitest</groupId>
+          <artifactId>pitest-maven</artifactId>
+          <version>1.5.2</version>
+        </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <configuration>
+          <!-- this is to ensure at least 28% of discovered scenarios are handled -->
+          <!-- TODO increase mutation threashold steadily over time to at least 50% -->
+          <mutationThreshold>28</mutationThreshold>
+          <!-- pitest really does not like how this test runs -->
+          <excludedTestClasses>
+            <excludedTestClass>newbank.server.NewBankTest</excludedTestClass>
+          </excludedTestClasses>
+          <excludedClasses>
+            <excludedClass>newbank.server.NewBank</excludedClass>
+          </excludedClasses>
+        </configuration>
+        <executions>
+          <execution>
+            <id>mutation-coverage</id>
+            <!-- Phase to ensure it runs after tests -->
+            <!-- To view reports go to target/pit-reports/<latest folder>/index.html -->
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>mutationCoverage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 </project>
