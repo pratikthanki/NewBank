@@ -1,7 +1,5 @@
 package newbank.client;
 
-import newbank.server.authentication.BasicAuthenticator;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,8 +25,8 @@ public class ExampleClient extends Thread {
             public void run() {
                 try {
                     while (true) {
-                        String responce = bankServerIn.readLine();
-                        System.out.println(responce);
+                        String response = bankServerIn.readLine();
+                        System.out.println(response);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

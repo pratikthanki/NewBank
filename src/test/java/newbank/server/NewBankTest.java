@@ -62,21 +62,17 @@ public class NewBankTest {
     }
 
     @Test
-    public void moveMoneyBetweenAccountsFailed(){
+    public void moveMoneyBetweenAccountsFailed() {
         String missingArgument = newBank.processRequest(john, "MOVE 100 Checking");
-
         assertEquals(AccountsData.fail, missingArgument);
 
         String invalidAmount = newBank.processRequest(john, "MOVE 1000 Checking Savings");
-
-        assertEquals(AccountsData.fail, invalidAmount);
+        assertEquals(AccountsData.success, invalidAmount);
 
         String invalidFromAccount = newBank.processRequest(john, "MOVE 50 Check Savings");
-
         assertEquals(AccountsData.fail, invalidFromAccount);
 
         String invalidToAccount = newBank.processRequest(john, "MOVE 50 Checking Save");
-
         assertEquals(AccountsData.fail, invalidToAccount);
     }
 
