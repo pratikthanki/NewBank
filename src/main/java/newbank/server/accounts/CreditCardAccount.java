@@ -25,7 +25,7 @@ public class CreditCardAccount extends Account {
 
     public double purchaseOnCredit(double price) throws InsufficientFundsException {
         if (getBalance() > price) {
-            withdrawMoney(-price);
+            withdrawMoney(price);
         } else {
             throw new InsufficientFundsException("Invalid request, not sufficient balance to make this purchase.");
         }
