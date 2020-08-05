@@ -1,6 +1,9 @@
 package newbank.server.accounts;
 
 import com.sun.jdi.request.InvalidRequestStateException;
+import newbank.server.Account;
+import newbank.server.Customer;
+import newbank.server.CustomerID;
 import newbank.server.NewBank;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,5 +67,25 @@ public class CreditCardAccountTest {
         double balance = creditCardAccount.accrueInterest(localDateTime);
 
         assertEquals(85.0, balance, 0.1);
+    }
+
+    @Test
+    public void payOffCredidCardBalance(){
+        creditCardAccount = new CreditCardAccount("Credit Card", 100.0, 1234, 1.15);
+        Account checking = new Account("Checking", 123, 1234);
+
+        creditCardAccount.purchaseOnCredit(10);
+
+        assertEquals(90, creditCardAccount.getBalance(), 0.1);
+
+        Customer customer = new Customer(new CustomerID("John"));
+        customer.addAccount(creditCardAccount);
+        customer.addAccount(checking);
+        checking.setDefaultAccount(customer);
+
+        creditCardAccount.payOffCreditCardBalance(customer, checking, 10.0);
+
+        assertEquals(100, creditCardAccount.getBalance(), 0.1);
+
     }
 }
