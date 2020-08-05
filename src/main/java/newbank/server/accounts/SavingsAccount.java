@@ -7,14 +7,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Savings extends Account {
+public class SavingsAccount extends Account {
 
     private double interestRate;
     private LocalDateTime startDate;
     private LocalDateTime interestPayableDate;
     private double standingOrderAmount;
 
-    public Savings(String accountName, double openingBalance, int accountPin, double standingOrderAmount, double interestRate) {
+    public SavingsAccount(String accountName, double openingBalance, int accountPin, double standingOrderAmount, double interestRate) {
         super(accountName, openingBalance, accountPin);
         this.startDate = LocalDateTime.now();
         this.interestPayableDate = LocalDateTime.now();
