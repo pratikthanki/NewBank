@@ -25,6 +25,21 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>6.0.2.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.validator</groupId>
+      <artifactId>hibernate-validator-annotation-processor</artifactId>
+      <version>6.0.2.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>2.0.0.Final</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -95,7 +110,7 @@
         <configuration>
           <!-- this is to ensure at least 28% of discovered scenarios are handled -->
           <!-- TODO increase mutation threashold steadily over time to at least 50% -->
-          <mutationThreshold>28</mutationThreshold>
+          <mutationThreshold>20</mutationThreshold>
           <!-- pitest really does not like how this test runs -->
           <excludedTestClasses>
             <excludedTestClass>newbank.server.NewBankTest</excludedTestClass>

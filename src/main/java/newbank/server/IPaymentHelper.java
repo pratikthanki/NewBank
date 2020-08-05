@@ -1,30 +1,12 @@
 package newbank.server;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.PrintWriter;
 
 public class IPaymentHelper implements IPayment {
 
     @Override
-    //check if customer exists
-    public Boolean checkCustomerExists(HashMap <String, Customer > map, String customer) {
-        try {
-            // Iterate over the HashMap
-            for (Map.Entry < String, Customer > entry: map.entrySet()) {
-                // Get the entry at this iteration and check if this key is the required key
-                if (customer.equals(entry.getKey())) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return false;
-    }
-
-    @Override
     //check if amount is a numerical value
-    public Boolean isNumeric(String strNum) {
+    public Boolean isNumeric(PrintWriter out, String strNum) {
         if (strNum == null) {
             return false;
         }
@@ -37,25 +19,14 @@ public class IPaymentHelper implements IPayment {
     }
 
     @Override
-    public Boolean calculateTransaction(Account from, Account to, Double amount) {
-        //check for sufficient balance
-        if (from == null) {
-            return false;
-        }
-        if (from.getBalance() < amount) {
-            System.out.println("This action is invalid, as this account does not have a sufficient balance.");
-            return false;
-        //execute transaction
-        } else {
+    public void calculateTransaction(Account from, Account to, Double amount) {
             from.withdrawMoney(amount);
             to.addMoney(amount);
-            return true;
-        }
     }
 
 
-
-
-
-
+    public Boolean checkAccountHasSufficientBalance(PrintWriter out, Account from, Double amount) {
+        //execute transaction
+        return !(from.getBalance() < amount);
+    }
 }

@@ -5,13 +5,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.*;
+
+import static newbank.database.static_data.NewBankData.*;
+import static newbank.server.MainMenu.*;
 
 public class NewBankClientHandler extends Thread {
 
     private final NewBank bank;
     private final BufferedReader in;
     private final PrintWriter out;
+
+    InputHandler inputHandler = new InputHandler();
 
     public NewBankClientHandler(Socket s) throws IOException {
         bank = NewBank.getBank();
@@ -23,23 +27,23 @@ public class NewBankClientHandler extends Thread {
         // keep getting requests from the client and processing them
         try {
             // ask for user name
-            out.println("Enter Username");
+            out.println(enterUsername);
             String userName = in.readLine();
             // ask for password
-            out.println("Enter Password");
+            out.println(enterPassword);
             String password = in.readLine();
-            out.println("Checking Details...");
+            out.println(checkingDetailsMessage);
             // authenticate user and get customer ID token from bank for use in subsequent requests
             CustomerID customer = bank.checkLogInDetails(userName, password);
             // if the user is authenticated then get requests from the user and process them
             if (customer != null) {
-                out.println("Login Successful. Enter a number to select one of the options:");
+                out.println(loginSuccessfulMessage);
 
                 // handle user commands
-                handleUserCommands(in, customer);
+                handleUserCommands(customer);
 
             } else {
-                out.println("Login Failed");
+                out.println(loginFailedMessage);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -55,83 +59,34 @@ public class NewBankClientHandler extends Thread {
 //                }
     }
 
-    private void processMenuSelection(HashMap<String, String> hashMap) {
-        // Print values
-        int count = 0;
-        for (String key : hashMap.values()) {
-            count++;
-            out.println(count + ".\t" + key);
-        }
-        out.println("9.\tQuit");
-    }
-
-    private HashMap<String, String> getMainMenu() {
-        //Menu options and requests
-        HashMap<String, String> menuOptions = new HashMap<>();
-        menuOptions.put("1", "SHOWMYACCOUNTS");
-        menuOptions.put("2", "NEWACCOUNT");
-        menuOptions.put("3", "MOVE");
-        menuOptions.put("4", "PAY");
-        menuOptions.put("5", "CUSTOMERDETAIL");
-        return menuOptions;
-    }
-
-    private void handleUserCommands(BufferedReader in, CustomerID customerID) throws IOException {
+    private void handleUserCommands(CustomerID customerID) throws IOException {
         String menuItem;
         do {
-            processMenuSelection(getMainMenu());
-            out.println("\nPlease select an option:");
+            processMenuSelection(out);
+            out.println(selectOption);
             menuItem = in.readLine();
-            switch (menuItem) {
-                case "1":
-                    out.println("Request from " + customerID.getKey());
-                    String response = bank.processRequest(customerID, getMainMenu().get("1"));
-                    out.println(response);
-                    break;
-                case "2":
-                    out.println("Request from " + customerID.getKey());
-                    out.println("Please enter the new account's name:");
-                    String newAccountName = in.readLine();
-                    String response2 = bank.processRequest(customerID, getMainMenu().get("2") + " " + newAccountName);
-                    out.println(response2);
-                    break;
-                case "3":
-                    out.println("Request from " + customerID.getKey());
-                    out.println("Please enter amount:");
-                    String amount = in.readLine();
-                    out.println("Please enter the FromAccount's name:");
-                    String from = in.readLine();
-                    out.println("Please enter the ToAccount's name:");
-                    String to = in.readLine();
-                    String response3 = bank.processRequest(customerID, getMainMenu().get("3") + " " + amount + " " + from + " " + to);
-                    out.println(response3);
-                    break;
-                case "4":
-                    out.println("Request from " + customerID.getKey());
-                    out.println("Please enter the Recipient name:");
-                    String to1 = in.readLine();
-                    out.println("Please enter amount:");
-                    String amount1 = in.readLine();
-                    out.println("Please enter the FromAccount's name:");
-                    String from1 = in.readLine();
-                    String response4 = bank.processRequest(customerID, getMainMenu().get("4") + " " + to1 + " " + amount1 + " " + from1);
-                    out.println(response4);
-                    break;
-                case "5":
-                    out.println("Retrieving customer detail...");
-                    out.println("CUSTOMER DETAIL");
-                    out.println("----------------------");
-                    out.println(bank.processRequest(customerID, getMainMenu().get("5")));
-                    out.println("----------------------");
-                    out.println("Done.");
-
-                    break;
-                case "9":
-                    out.println("Bye-bye!");
-                    break;
-                default:
-                    out.println("Invalid choice.");
-            }
-        } while (!menuItem.equals("9"));
+                switch (menuItem) {
+                    case enumIdOne:
+                        inputHandler.showMyAccounts(out, customerID, bank);
+                        break;
+                    case enumIdTwo:
+                        inputHandler.newAccount(in, out, customerID, bank);
+                        break;
+                    case enumIdThree:
+                        inputHandler.moveMoneyBetweenAccounts(in, out, customerID, bank);
+                        break;
+                    case enumIdFour:
+                        inputHandler.payMoneyToCustomer(in, out, customerID, bank);
+                        break;
+                    case enumIdFive:
+                        inputHandler.getCustomerDetails(out, customerID, bank);
+                        break;
+                    case enumIdNine:
+                        out.println(bye);
+                        break;
+                    default:
+                        out.println(invalidChoice);
+                }
+        } while (!menuItem.equals(enumIdNine));
     }
 }
