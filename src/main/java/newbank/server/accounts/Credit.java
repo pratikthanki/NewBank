@@ -1,6 +1,6 @@
 package newbank.server.accounts;
 
-import com.sun.jdi.request.InvalidRequestStateException;
+import newbank.exceptions.InsufficientFundsException;
 import newbank.server.Account;
 import newbank.server.Customer;
 
@@ -23,18 +23,18 @@ public class Credit extends Account {
         this.interestRate = interestRate;
     }
 
-    public double purchaseOnCredit(double price){
-        if(getBalance() > price){
+    public double purchaseOnCredit(double price) throws InsufficientFundsException {
+        if (getBalance() > price) {
             withdrawMoney(price);
         } else {
-            throw new InvalidRequestStateException("Invalid request, not sufficient balance to make this purchase.");
+            throw new InsufficientFundsException("Invalid request, not sufficient balance to make this purchase.");
         }
         return getBalance();
     }
 
-    public double accrueInterest(LocalDateTime currentDateTime){
+    public double accrueInterest(LocalDateTime currentDateTime) {
         int dayOfMonth = interestPayableDate.getDayOfMonth();
-        if(currentDateTime.getDayOfMonth() == dayOfMonth && !currentDateTime.equals(interestPayableDate)){
+        if (currentDateTime.getDayOfMonth() == dayOfMonth && !currentDateTime.equals(interestPayableDate)) {
             double balance = getBalance();
             double moneyOwed = creditLimit - balance;
             double interest = (moneyOwed * interestRate) - moneyOwed;
