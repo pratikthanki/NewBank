@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CreditCardAccount extends Account {
+public class Credit extends Account {
 
     private double interestRate;
     private LocalDateTime startDate;
     private LocalDateTime interestPayableDate;
     private double creditLimit;
 
-    public CreditCardAccount(String accountName, double openingBalance, int accountPin, double interestRate) {
+    public Credit(String accountName, double openingBalance, int accountPin, double interestRate) {
         super(accountName, openingBalance, accountPin);
         this.startDate = LocalDateTime.now();
         this.interestPayableDate = LocalDateTime.now();
