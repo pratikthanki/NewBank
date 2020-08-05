@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
 
-public class SavingsAccountTest {
+public class SavingsTest {
 
-    SavingsAccount savingsAccount;
+    Savings savings;
     NewBank newBank;
 
     @Before
@@ -23,22 +23,22 @@ public class SavingsAccountTest {
 
     @Test
     public void testSavingsAccountCreation() {
-        savingsAccount = new SavingsAccount("Savings", 100.0, 1234, 50.0, 1.5);
-        assertEquals("Savings", savingsAccount.getAccountName());
-        assertEquals(100.0, savingsAccount.getBalance(), 0.1);
-        assertEquals(50, savingsAccount.getStandingOrderAmount(), 0.1);
-        assertEquals(1.5, savingsAccount.getInterestRate(), 0.1);
+        savings = new Savings("Savings", 100.0, 1234, 50.0, 1.5);
+        assertEquals("Savings", savings.getAccountName());
+        assertEquals(100.0, savings.getBalance(), 0.1);
+        assertEquals(50, savings.getStandingOrderAmount(), 0.1);
+        assertEquals(1.5, savings.getInterestRate(), 0.1);
         LocalDateTime localDateTime = LocalDateTime.now();
-        assertEquals(localDateTime.getDayOfMonth(), savingsAccount.getStartDate().getDayOfMonth());
-        assertEquals(localDateTime.getDayOfMonth(), savingsAccount.getInterestPayableDate().getDayOfMonth());
+        assertEquals(localDateTime.getDayOfMonth(), savings.getStartDate().getDayOfMonth());
+        assertEquals(localDateTime.getDayOfMonth(), savings.getInterestPayableDate().getDayOfMonth());
     }
 
     @Test
     public void testInterestDeposit() {
-        savingsAccount = new SavingsAccount("Savings", 100.0, 1234, 50.0, 1.5);
+        savings = new Savings("Savings", 100.0, 1234, 50.0, 1.5);
 
         LocalDateTime localDateTime = LocalDateTime.now().plusMonths(1);
-        double balance = savingsAccount.payInterestIntoAccount(localDateTime);
+        double balance = savings.payInterestIntoAccount(localDateTime);
 
         assertEquals(150, balance, 0.1);
     }
@@ -46,18 +46,18 @@ public class SavingsAccountTest {
 
     @Test
     public void testStandingOrderDeposit() {
-        savingsAccount = new SavingsAccount("Savings", 100.0, 1234, 50.0, 1.5);
+        savings = new Savings("Savings", 100.0, 1234, 50.0, 1.5);
         Account checking = new Account("Checking", 123, 1234);
 
         Customer customer = new Customer(new CustomerID("John"));
-        customer.addAccount(savingsAccount);
+        customer.addAccount(savings);
         customer.addAccount(checking);
         checking.setDefaultAccount(customer);
 
         LocalDateTime localDateTime = LocalDateTime.now().plusMonths(1);
 
-        savingsAccount.setUpStandingOrderBetweenAccounts(customer, checking,50, localDateTime);
+        savings.setUpStandingOrderBetweenAccounts(customer, checking,50, localDateTime);
 
-        assertEquals(150.0, savingsAccount.getBalance(), 0.1);
+        assertEquals(150.0, savings.getBalance(), 0.1);
     }
 }
