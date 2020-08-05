@@ -110,7 +110,7 @@
         <configuration>
           <!-- this is to ensure at least 28% of discovered scenarios are handled -->
           <!-- TODO increase mutation threashold steadily over time to at least 50% -->
-          <mutationThreshold>28</mutationThreshold>
+          <mutationThreshold>20</mutationThreshold>
           <!-- pitest really does not like how this test runs -->
           <excludedTestClasses>
             <excludedTestClass>newbank.server.NewBankTest</excludedTestClass>
