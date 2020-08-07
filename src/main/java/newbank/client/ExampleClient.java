@@ -23,10 +23,10 @@ public class ExampleClient extends Thread {
             private BufferedReader bankServerIn = new BufferedReader(new InputStreamReader(server.getInputStream()));
 
             public void run() {
+            	String response;
                 try {
-                    while (true) {
-                        String response = bankServerIn.readLine();
-                        System.out.println(response);
+                    while((response = bankServerIn.readLine())!=null) {
+                        	System.out.println(response );
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
