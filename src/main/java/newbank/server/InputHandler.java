@@ -65,6 +65,7 @@ public class InputHandler {
             out.println(accountLabel + fromAccount + insufficientBalanceMessage);
         } else {
             String response = bank.processRequest(customerID, Pay.getMenuOption() + emptyString + recipient + emptyString + amount + emptyString + fromAccount);
+            verifyAmountBiggerThanEmailNotificationThreshold(out, dAmount, customerID, bank);
             out.println(response);
         }
     }
@@ -201,5 +202,14 @@ public class InputHandler {
         HashMap < String, Customer > map = bank.getCustomers();
         Customer customer = map.get(customerID.getKey());
         return iPaymentHelper.checkAccountHasSufficientBalance(out, customer.getHasMapForAllCustomerAccounts().get(fromAccount), amount);
+    }
+
+    private void verifyAmountBiggerThanEmailNotificationThreshold(PrintWriter out, Double amount, CustomerID customerID, NewBank bank){
+        HashMap < String, Customer > map = bank.getCustomers();
+        Customer customer = map.get(customerID.getKey());
+        String emailTo = customer.getEmail();
+        if (amount > 49){
+            EmailHandler.sendEmail(out, emailTo, "test", "test");
+        }
     }
 }
