@@ -6,8 +6,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import static newbank.database.static_data.NewBankData.*;
 import static newbank.server.MainMenu.*;
-import static newbank.server.MainMenu.processMenuSelection;
-import static newbank.server.UpdateCustomerDetailsMenu.*;
 
 public class InputHandler {
 
@@ -56,7 +54,6 @@ public class InputHandler {
         String fromAccount;
 
         out.println(requestFrom + customerID.getKey());
-
 
         recipient = verifyCustomer(out, in , bank);
         amount = verifyAmount(out, in );
@@ -123,14 +120,11 @@ public class InputHandler {
 			out.println("Enter Customer Date of Birth");
 			properties.put(Parameter.DOB, in.readLine());
 			
-			out.println(
-					bank.processRequest(customerID, updateCustomerDOB, properties));
-			
+			out.println(bank.processRequest(customerID, updateCustomerDOB, properties));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
 		}
-		
 	}
 
 	private void updateCustomerName(BufferedReader in, PrintWriter out, CustomerID customerID, NewBank bank) {

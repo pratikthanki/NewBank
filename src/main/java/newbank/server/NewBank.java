@@ -219,11 +219,9 @@ public class NewBank {
 		} catch (ParseException e) {
 			return Status.FAIL.toString() + ": Date format error.";
 		}
-        
 	}
     
     public String registerNewCustomer(Map<String,String> properties) {
-		
 		String firstname = properties.get("firstname");
 		String surname = properties.get("surname");
 		String newPassword = properties.get("password1");
@@ -249,7 +247,6 @@ public class NewBank {
 		if ( !(customer.setPassword(confirmPassword)) ) {
 			return  Status.FAIL.toString() + ":Password Rejected";
 		}
-			
 		
 		databaseClient.addNewCustomer(firstname, customer);
 		

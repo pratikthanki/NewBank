@@ -2,9 +2,7 @@ package newbank.server.authentication;
 
 import newbank.database.DatabaseClient;
 import newbank.server.CustomerID;
-
 import java.net.Authenticator;
-
 
 public class BasicAuthenticator extends Authenticator {
     private String userName, password;
