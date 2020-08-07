@@ -5,6 +5,8 @@ import org.junit.*;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+
 public class NewBankTest {
     NewBank newBank;
     CustomerID john;
@@ -122,5 +124,19 @@ public class NewBankTest {
     @Test
     public void createNewAccountWithoutAccountName(){
         assertEquals(AccountsData.fail, newBank.processRequest(john, AccountsData.NEWACCOUNT));
+    }
+    
+    public void registerNewCustomer() {
+    	HashMap<String, String> properties = new HashMap<>();
+		
+		properties.put("firstname", "Peter");
+		properties.put("surname", "Pan");
+		properties.put("email", "peter.pan@gmail.com");
+		properties.put("address", "Lagos, Nigeria");
+		properties.put("dob", "5 7 2000");
+		properties.put("password1", "MyPa55w0rd");
+		properties.put("password2", "MyPa55w0rd");
+		newBank.registerNewCustomer(properties);
+        assertTrue(true);
     }
 }
