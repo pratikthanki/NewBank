@@ -20,8 +20,8 @@ public class IPaymentHelper implements IPayment {
 
     @Override
     public void calculateTransaction(Account from, Account to, Double amount) {
-            from.withdrawMoney(amount);
-            to.addMoney(amount);
+        from.withdrawMoney(amount);
+        to.addMoney(amount);
     }
 
 
