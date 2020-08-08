@@ -1,6 +1,6 @@
 package newbank.server.authentication;
 
-import newbank.database.MapDatabaseClient;
+import newbank.database.DatabaseClient;
 import newbank.server.CustomerID;
 
 import java.net.Authenticator;
@@ -8,11 +8,12 @@ import java.net.Authenticator;
 
 public class BasicAuthenticator extends Authenticator {
     private String userName, password;
-    private MapDatabaseClient databaseClient = new MapDatabaseClient();
+    private final DatabaseClient databaseClient;
 
-    public BasicAuthenticator(final String userName, final String password) {
+    public BasicAuthenticator(final String userName, final String password, DatabaseClient databaseClient) {
         this.userName = userName;
         this.password = password;
+        this.databaseClient = databaseClient;
     }
 
     public CustomerID ValidateLogin() {

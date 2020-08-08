@@ -34,7 +34,7 @@ public class NewBank {
     }
 
     public synchronized CustomerID checkLogInDetails(String userName, String password) {
-        basicAuthenticator = new BasicAuthenticator(userName, password);
+        basicAuthenticator = new BasicAuthenticator(userName, password, databaseClient);
 
         return basicAuthenticator.ValidateLogin();
     }
