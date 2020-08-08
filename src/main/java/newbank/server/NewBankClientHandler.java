@@ -1,5 +1,8 @@
 package newbank.server;
 
+import newbank.database.HibernateDatabaseClient;
+import newbank.database.HibernateUtility;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,6 +21,10 @@ public class NewBankClientHandler extends Thread {
     InputHandler inputHandler = new InputHandler();
 
     public NewBankClientHandler(Socket s) throws IOException {
+        HibernateDatabaseClient databaseClient = new HibernateDatabaseClient(HibernateUtility.development());
+        NewBank.init(databaseClient);
+        //Just to get people up and running quickly
+        databaseClient.addTestData();
         bank = NewBank.getBank();
         in = new BufferedReader(new InputStreamReader(s.getInputStream()));
         out = new PrintWriter(s.getOutputStream(), true);
