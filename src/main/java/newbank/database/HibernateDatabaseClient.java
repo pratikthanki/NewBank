@@ -90,7 +90,7 @@ public class HibernateDatabaseClient implements DatabaseClient {
 
     @Override
     public List<Account> getAccounts(String customer) {
-        return null;
+        return getCustomerById(customer).getAccounts();
     }
 
     @Override
