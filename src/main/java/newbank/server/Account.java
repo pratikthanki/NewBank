@@ -68,5 +68,4 @@ public class Account {
     public String toString() {
         return (accountName + ": " + balance);
     }
-
 }

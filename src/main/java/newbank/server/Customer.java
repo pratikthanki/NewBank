@@ -98,24 +98,6 @@ public class Customer {
 		return map;
 	}
 
-	//check if account exists
-	public Boolean checkAccountExists(Account account) {
-		try {
-
-			HashMap<String, Account> map = getHasMapForAllCustomerAccounts();
-			// Iterate over the HashMap
-			for (Map.Entry<String, Account> entry : map.entrySet()) {
-				// Get the entry at this iteration and check if this key is the required key
-				if (account.toString().equals(entry.getKey())) {
-					return true;
-				}
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-		return false;
-	}
-
 	public Date getDob() {
 		return this.dob;
 	}

@@ -29,7 +29,7 @@ public class SavingsAccount extends Account {
         if(currentDateTime.getDayOfMonth() == dayOfMonth && !currentDateTime.equals(startDate)){
             List<String> accountNames = customer.getAccounts().stream().map(Account::getAccountName).collect(Collectors.toList());
             if(accountNames.contains(account.getAccountName()) && accountNames.contains(getAccountName())){
-                account.addMoney(-standingOrderAmount);
+                account.withdrawMoney(standingOrderAmount);
                 addMoney(standingOrderAmount);
             }
         }

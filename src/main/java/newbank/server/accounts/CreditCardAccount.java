@@ -1,9 +1,12 @@
 package newbank.server.accounts;
 
-import com.sun.jdi.request.InvalidRequestStateException;
+import newbank.exceptions.InsufficientFundsException;
 import newbank.server.Account;
+import newbank.server.Customer;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreditCardAccount extends Account {
 
@@ -20,24 +23,32 @@ public class CreditCardAccount extends Account {
         this.interestRate = interestRate;
     }
 
-    public double purchaseOnCredit(double price){
-        if(getBalance() > price){
-            addMoney(-price);
+    public double purchaseOnCredit(double price) throws InsufficientFundsException {
+        if (getBalance() > price) {
+            withdrawMoney(price);
         } else {
-            throw new InvalidRequestStateException("Invalid request, not sufficient balance to make this purchase.");
+            throw new InsufficientFundsException("Invalid request, not sufficient balance to make this purchase.");
         }
         return getBalance();
     }
 
-    public double accrueInterest(LocalDateTime currentDateTime){
+    public double accrueInterest(LocalDateTime currentDateTime) {
         int dayOfMonth = interestPayableDate.getDayOfMonth();
-        if(currentDateTime.getDayOfMonth() == dayOfMonth && !currentDateTime.equals(interestPayableDate)){
+        if (currentDateTime.getDayOfMonth() == dayOfMonth && !currentDateTime.equals(interestPayableDate)) {
             double balance = getBalance();
             double moneyOwed = creditLimit - balance;
             double interest = (moneyOwed * interestRate) - moneyOwed;
-            addMoney(-interest);
+            withdrawMoney(interest);
         }
         return getBalance();
+    }
+
+    public void payOffCreditCardBalance(Customer customer, Account account, double amountToPay){
+        List<String> accountNames = customer.getAccounts().stream().map(Account::getAccountName).collect(Collectors.toList());
+        if(accountNames.contains(account.getAccountName()) && accountNames.contains(getAccountName())){
+            account.withdrawMoney(amountToPay);
+            addMoney(amountToPay);
+        }
     }
 
     public double getInterestRate() {

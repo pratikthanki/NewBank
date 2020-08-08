@@ -3,12 +3,11 @@ package newbank.server;
 import newbank.database.DatabaseClient;
 import newbank.database.HibernateDatabaseClient;
 import newbank.database.HibernateUtility;
-import newbank.database.MapDatabaseClient;
 import newbank.server.authentication.BasicAuthenticator;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import static newbank.database.static_data.NewBankData.*;
 
 public class NewBank {
 
@@ -44,38 +43,38 @@ public class NewBank {
     public synchronized String processRequest(CustomerID customerID, String request) {
         if (databaseClient.hasCustomer(customerID.getKey())) {
             switch (parseString(request)[0]) {
-                case "SHOWMYACCOUNTS":
+                case showMyAccounts:
                     return showMyAccounts(customerID);
-                case "NEWACCOUNT":
+                case newAccount:
                     return createNewAccount(customerID, request);
-                case "MOVE":
+                case move:
                     return moveMoney(customerID, request);
-                case "PAY":
+                case pay:
                     return payMoney(customerID, request);
-                case "CUSTOMERDETAIL":
+                case customerDetail:
                     return getCustomer(customerID, request).getDetail();
                 default:
-                    return "FAIL";
+                    return Status.FAIL.toString();
             }
         }
-        return "FAIL";
+        return Status.FAIL.toString();
     }
 
     private Customer getCustomer(CustomerID customer, String request) {
-        if (request.equals("CUSTOMERDETAIL")) {
+        if (request.equals(customerDetail)) {
             return databaseClient.getCustomerById(customer);
         }
         return null;
     }
 
     private String createNewAccount(CustomerID customerID, String request) {
-        String[] requestAndDetails = request.split(" ");
+        String[] requestAndDetails = request.split(emptyString);
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
             databaseClient.addAccount(customerID, new Account(newAccountName, 0.0, 1234));
-            return "SUCCESS";
+            return Status.SUCCESS.toString();
         }
-        return "FAIL";
+        return Status.FAIL.toString();
     }
 
     private String showMyAccounts(CustomerID customer) {
@@ -83,100 +82,87 @@ public class NewBank {
     }
 
     private String moveMoney(CustomerID customerID, String request) {
+        //User input
         String[] parsedInput = parseString(request);
-        Customer customer = databaseClient.getCustomerById(customerID);
-        List<Account> accountsAssociatedToCustomer = customer.getAccounts();
-        Map<String, Account> mapOfAccountNamesToAccounts = new HashMap<>();
-        for (Account a : accountsAssociatedToCustomer) {
-            mapOfAccountNamesToAccounts.put(a.getAccountName(), a);
-        }
-        if (parsedInput.length != 4) {
-            System.out.println("You have not provided all the required values to transfer money between your accounts. " +
-                    "Please provide the request in the following format: MOVE <Amount> <FromAccount> <ToAccount>");
-            return "FAIL";
-        }
 
-        //Get amount
-        Double amount = Double.valueOf(parsedInput[1]);
+        if (parsedInput.length != 4) return Status.FAIL.toString();
+
+        //customer
+        Customer customer = databaseClient.getCustomerById(customerID);
+
+        //amount
+        String userInputAmount = parsedInput[1];
+        if (!validUserAmount(userInputAmount)) return Status.FAIL.toString();
+        Double amount = Double.parseDouble(userInputAmount);
+
+        HashMap<String, Account> customerAccounts = customer.getHasMapForAllCustomerAccounts();
 
         //Get the 'from' account
-        Account from = mapOfAccountNamesToAccounts.get(parsedInput[2]);
-        if (from == null) {
-            System.out.println("Provided 'from' account does not exist, please check your input and try again.");
-            return "FAIL";
-        }
+        Account from = customerAccounts.get(parsedInput[2]);
 
         //Get the 'to' account
-        Account to = mapOfAccountNamesToAccounts.get(parsedInput[3]);
-        if (to == null) {
-            System.out.println("Provided 'to' account does not exist, please check your input and try again.");
-            return "FAIL";
-        }
+        Account to = customerAccounts.get(parsedInput[3]);
 
-        //Check if the 'from' account has sufficient balance for the money move
-        if (from.getBalance() < amount) {
-            System.out.println("This action is invalid, as this account does not have a sufficient balance.");
-            return "FAIL";
-        } else {
-            from.withdrawMoney(amount);
-            to.addMoney(amount);
-            System.out.println("From Account:" + from.toString());
-            System.out.println("To Account:" + to.toString());
-            return "SUCCESS";
-        }
+        if (from == null || to == null) return Status.FAIL.toString();
+
+        //Calculate transaction
+        paymentHelper.calculateTransaction(from, to, amount);
+        return Status.SUCCESS.toString();
     }
 
     //pay another person
     private String payMoney(CustomerID customerID, String request) {
+        //User input
         String[] parsedInput = parseString(request);
+        if (parsedInput.length != 4) return Status.FAIL.toString();
 
         //payer
         Customer payer = databaseClient.getCustomerById(customerID);
+        HashMap<String, Account> payerAccounts = payer.getHasMapForAllCustomerAccounts();
 
-        //check payee customer exists
+        //payee
         String payeeCustomerName = parsedInput[1];
         Customer payee = databaseClient.getCustomerById(payeeCustomerName);
+        if (payee == null) return Status.FAIL.toString();
 
-        //check user input
-        if (parsedInput.length != 4) {
-            System.out.println("You have not provided all the required values to PAY money to another customer " +
-                    "Please provide the request in the following format: PAY <CustomerName> <Amount> <AccountFrom>");
-            return "FAIL";
-        }
+        HashMap<String, Account> payeeAccounts = payee.getHasMapForAllCustomerAccounts();
+        if (payeeAccounts.size() == 0) return Status.FAIL.toString();
 
         //check if amount is a valid numerical value
-        String strAmount = parsedInput[2];
-        if (!paymentHelper.isNumeric(strAmount)) {
-            return "FAIL";
-        }
-        Double amount = Double.valueOf(strAmount);
+        String userInputAmount = parsedInput[2];
+
+        if (!validUserAmount(userInputAmount)) return Status.FAIL.toString();
+        Double amount = Double.parseDouble(userInputAmount);
 
         //Get the 'from' account
-        Account from = payer.getHasMapForAllCustomerAccounts().get(parsedInput[3]);
+        Account from = payerAccounts.get(parsedInput[3]);
 
-        //Get the 'to' account
-        if (!databaseClient.hasCustomer(payeeCustomerName)) {
-            return "FAIL";
-        }
+        //Get payee's default account
         Account to = payee.getDefaultAccount();
 
-        //check if accounts exist and if the 'payerAccount' account has sufficient balance for the money move
-        if (payer.checkAccountExists(from) || payee.checkAccountExists(to)) {
-            return "FAIL";
-        }
+        if (from == null || to == null) return Status.FAIL.toString();
 
-        //PAY Name Amount FromAccount
-        if (!paymentHelper.calculateTransaction(from, to, amount)) {
-            return "FAIL";
-        } else {
-            databaseClient.updateCustomer(payer);
-            databaseClient.updateCustomer(payee);
-            return "SUCCESS";
-        }
-
+        //Calculate transaction
+        paymentHelper.calculateTransaction(from, to, amount);
+        databaseClient.updateCustomer(payer);
+        databaseClient.updateCustomer(payee);
+        return Status.SUCCESS.toString();
     }
 
+    public boolean validUserAmount(final String s) {
+        try {
+            final double move = Double.parseDouble(s);
+            return true;
+        } catch (final NumberFormatException e) {
+            System.out.printf("Error: invalid input \"%s\", please try again.\n", s);
+        }
+        return false;
+    }
     private String[] parseString(String inputString) {
-        return inputString.split(" ");
+        return inputString.split(emptyString);
+    }
+
+    public Customer getCustomerById(String customerID) {
+        return databaseClient.getCustomerById(customerID);
     }
 }
