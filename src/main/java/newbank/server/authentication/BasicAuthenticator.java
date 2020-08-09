@@ -2,13 +2,11 @@ package newbank.server.authentication;
 
 import newbank.database.DatabaseClient;
 import newbank.server.CustomerID;
-
 import java.net.Authenticator;
-
 
 public class BasicAuthenticator extends Authenticator {
     private String userName, password;
-    private DatabaseClient databaseClient = new DatabaseClient();
+    private DatabaseClient databaseClient;
 
     public BasicAuthenticator(final String userName, final String password) {
         this.userName = userName;
@@ -22,5 +20,9 @@ public class BasicAuthenticator extends Authenticator {
         if (pwd.equals(this.password)) return new CustomerID(this.userName);
 
         return null;
+    }
+    
+    public void setDatabase(DatabaseClient database) {
+    	this.databaseClient = database;
     }
 }

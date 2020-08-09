@@ -2,7 +2,6 @@ package newbank.server;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Date;
 
 public class Customer {
@@ -24,6 +23,13 @@ public class Customer {
 		this(); //Customer()
 		this.customerID = customerID;
 	}
+	
+	//Constructor 3
+	public Customer(String firstname, String surname) {
+    	this(); 
+        this.customerID = new CustomerID(firstname);
+        this.name = firstname + " " + surname;
+	 }
 
 	public CustomerID getCustomerID() {
 		return customerID;
@@ -123,7 +129,10 @@ public class Customer {
 	}
 
 	public boolean setPassword(String password) {
-		if (isValidPassword(password)) this.password = password;
+		if (isValidPassword(password)) {
+			this.password = password;
+			return true;
+		}
 
 		return false;
 	}
