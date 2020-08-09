@@ -1,42 +1,70 @@
 package newbank.server;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Date;
+import javax.persistence.*;
+import java.util.*;
 
+@Entity
+@Table(name = "customers")
 public class Customer {
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	@Column(name = "id")
+	private int id;
 
-	private final ArrayList<Account> accounts;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinColumn(name = "account_ids")
+	private List<Account> accounts;
+
+	@Column(name = "date_of_birth")
 	private Date dob;
+
+	@Column(name = "email")
 	private String email;
+
+	@Column(name = "name")
 	private String name;
+
+	@Column(name = "address")
 	private String address;
-	private CustomerID customerID;
+
+	@Column(name = "customer_id", unique = true)
+	private String customerID;
+
+	@Column(name = "password")
 	private String password;
 
 	public Customer() {
-		accounts = new ArrayList<>();
+		this.accounts = new ArrayList<>();
 	}
 
 	//Constructor 2: Create customer while providing CustomerID
 	public Customer(CustomerID customerID) {
-		this(); //Customer()
-		this.customerID = customerID;
+		this.accounts = new ArrayList<>();
+		this.customerID = customerID.getKey();
 	}
-	
+
 	//Constructor 3
 	public Customer(String firstname, String surname) {
-    	this(); 
-        this.customerID = new CustomerID(firstname);
+    	this();
+        this.customerID = firstname;
         this.name = firstname + " " + surname;
 	 }
 
 	public CustomerID getCustomerID() {
-		return customerID;
+		return new CustomerID(customerID);
 	}
 
-	public ArrayList<Account> getAccounts() {
+	public void setCustomerID(CustomerID customerID){
+		this.customerID = customerID.getKey();
+	}
+
+	public List<Account> getAccounts() {
 		return accounts;
+	}
+
+	//Important for Hibernate
+	public void setAccounts(List<Account> accounts){
+		this.accounts = accounts;
 	}
 
 	public String accountsToString() {
@@ -71,7 +99,7 @@ public class Customer {
 	public HashMap<String, Account> getHasMapForAllCustomerAccounts() {
 		// Create a HashMap
 		HashMap<String, Account> map = new HashMap<>();
-		for (Account a : accounts) {
+		for (Account a : getAccounts()) {
 			map.put(a.getAccountName(), a);
 		}
 		return map;
@@ -164,5 +192,19 @@ public class Customer {
 
 	private static boolean isInt(char ch) {
 		return (ch >= '0' && ch <= '9');
+	}
+
+	@Override
+	public String toString() {
+		return "Customer{" +
+				"id=" + id +
+//				", accounts=" + accounts +
+				", dob=" + dob +
+				", email='" + email + '\'' +
+				", name='" + name + '\'' +
+				", address='" + address + '\'' +
+				", customerID='" + customerID + '\'' +
+				", password='" + password + '\'' +
+				'}';
 	}
 }

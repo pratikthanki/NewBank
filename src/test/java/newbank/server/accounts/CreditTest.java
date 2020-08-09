@@ -17,12 +17,6 @@ import static org.junit.Assert.fail;
 public class CreditTest {
 
     Credit credit;
-    NewBank newBank;
-
-    @Before
-    public void SetUp() {
-        newBank = NewBank.getBank();
-    }
 
     @Test
     public void testSavingsAccountCreation() {

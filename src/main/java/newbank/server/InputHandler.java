@@ -216,8 +216,7 @@ public class InputHandler {
     }
 
     private String verifyFromAccount(PrintWriter out, BufferedReader in , CustomerID customerID, NewBank bank) {
-        HashMap < String, Customer > map = bank.getCustomers();
-        Customer customer = map.get(customerID.getKey());
+        Customer customer = bank.getCustomerById(customerID.getKey());
         String from = "";
         out.println(enterFromAccountName);
         while (true) {
@@ -238,8 +237,7 @@ public class InputHandler {
     }
 
     private String verifyToAccount(PrintWriter out, BufferedReader in , CustomerID customerID, NewBank bank) {
-        HashMap < String, Customer > map = bank.getCustomers();
-        Customer customer = map.get(customerID.getKey());
+        Customer customer = bank.getCustomerById(customerID.getKey());
         String to = "";
         out.println(enterToAccountName);
         while (true) {
@@ -269,7 +267,7 @@ public class InputHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Customer customer = bank.getCustomers().get(recipient);
+            Customer customer = bank.getCustomerById(recipient);
             if (customer == null) {
                 out.println(recipient + customerNotFound);
             }
@@ -298,8 +296,7 @@ public class InputHandler {
     }
 
     private Boolean verifyPayerSufficientBalance(PrintWriter out, CustomerID customerID, NewBank bank, Double amount, String fromAccount) {
-        HashMap < String, Customer > map = bank.getCustomers();
-        Customer customer = map.get(customerID.getKey());
+        Customer customer = bank.getCustomerById(customerID.getKey());
         return iPaymentHelper.checkAccountHasSufficientBalance(out, customer.getHasMapForAllCustomerAccounts().get(fromAccount), amount);
     }
 }

@@ -1,5 +1,7 @@
 package newbank.server;
 
+import newbank.database.HibernateDatabaseClient;
+import newbank.database.HibernateUtility;
 import newbank.server.StaticData.AccountsData;
 import org.junit.*;
 
@@ -14,6 +16,9 @@ public class NewBankTest {
 
     @Before
     public void SetUp() {
+        HibernateDatabaseClient databaseClient = new HibernateDatabaseClient(HibernateUtility.test());
+        NewBank.init(databaseClient);
+        databaseClient.addTestData();
         newBank = NewBank.getBank();
         john = new CustomerID("John");
         bhagy = new CustomerID("Bhagy");

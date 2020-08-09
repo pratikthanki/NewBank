@@ -6,23 +6,20 @@ import java.net.Authenticator;
 
 public class BasicAuthenticator extends Authenticator {
     private String userName, password;
-    private DatabaseClient databaseClient;
+    private final DatabaseClient databaseClient;
 
-    public BasicAuthenticator(final String userName, final String password) {
+    public BasicAuthenticator(final String userName, final String password, DatabaseClient databaseClient) {
         this.userName = userName;
         this.password = password;
+        this.databaseClient = databaseClient;
     }
 
     public CustomerID ValidateLogin() {
-        if (databaseClient.getCustomerByName(this.userName) == null) return null;
+        if (databaseClient.getCustomerById(this.userName) == null) return null;
 
-        String pwd = databaseClient.getCustomerByName(this.userName).getPassword();
+        String pwd = databaseClient.getCustomerById(this.userName).getPassword();
         if (pwd.equals(this.password)) return new CustomerID(this.userName);
 
         return null;
-    }
-    
-    public void setDatabase(DatabaseClient database) {
-    	this.databaseClient = database;
     }
 }

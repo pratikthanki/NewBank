@@ -1,6 +1,8 @@
 package newbank.server;
 
 import newbank.database.DatabaseClient;
+import newbank.database.HibernateDatabaseClient;
+import newbank.database.HibernateUtility;
 import newbank.server.authentication.BasicAuthenticator;
 
 import java.text.ParseException;
@@ -13,34 +15,37 @@ import static newbank.database.static_data.NewBankData.*;
 
 public class NewBank {
 
-    private static final NewBank bank = new NewBank();
+    private static NewBank bank;
     private static final IPaymentHelper paymentHelper = new IPaymentHelper();
-    private DatabaseClient databaseClient = new DatabaseClient();
-    private HashMap<String, Customer> customers;
+    private final DatabaseClient databaseClient;
     private BasicAuthenticator basicAuthenticator;
 
-    private NewBank() {
-        customers = databaseClient.getCustomers();
+    private NewBank(DatabaseClient databaseClient) {
+        this.databaseClient = databaseClient;
     }
 
     public static NewBank getBank() {
+        if (bank == null) {
+            bank = new NewBank(new HibernateDatabaseClient(HibernateUtility.development()));
+        }
         return bank;
     }
 
-    public HashMap<String, Customer> getCustomers() {
-        return customers;
+    public static void init(DatabaseClient databaseClient) {
+        if (bank == null) {
+            bank = new NewBank(databaseClient);
+        }
     }
 
     public synchronized CustomerID checkLogInDetails(String userName, String password) {
-        basicAuthenticator = new BasicAuthenticator(userName, password);
-        basicAuthenticator.setDatabase(databaseClient);
+        basicAuthenticator = new BasicAuthenticator(userName, password, databaseClient);
 
         return basicAuthenticator.ValidateLogin();
     }
 
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customerID, String request) {
-        if (customers.containsKey(customerID.getKey())) {
+        if (databaseClient.hasCustomer(customerID.getKey())) {
             switch (parseString(request)[0]) {
                 case showMyAccounts:
                     return showMyAccounts(customerID);
@@ -53,23 +58,23 @@ public class NewBank {
                 case customerDetail:
                     return getCustomer(customerID).getDetail();
                 case showCustomerName:
-                	return getCustomer(customerID).getName();
+                    return getCustomer(customerID).getName();
                 case showCustomerEmail:
-                	return getCustomer(customerID).getEmail();
+                    return getCustomer(customerID).getEmail();
                 case showCustomerDOB:
-                	return new SimpleDateFormat("d MM yyyy").format(getCustomer(customerID).getDob());
+                    return new SimpleDateFormat("d MM yyyy").format(getCustomer(customerID).getDob());
                 case showCustomerAddress:
-                	return getCustomer(customerID).getAddress();
+                    return getCustomer(customerID).getAddress();
                 default:
                     return Status.FAIL.toString();
             }
         }
         return Status.FAIL.toString();
     }
-    
+
     // commands from the NewBank customer are processed in this method
     public synchronized String processRequest(CustomerID customer, String command, Map<Parameter, String> properties) {
-        if (customers.containsKey(customer.getKey())) {
+        if (databaseClient.hasCustomer(customer.getKey())) {
             switch (command) {
                 case updateCustomerEmail:
                     return updateCustomerEmail(customer, command, properties);
@@ -86,34 +91,32 @@ public class NewBank {
         return "FAIL";
     }
 
-	private Customer getCustomer(CustomerID customer) {
-        if (customer != null) {
-            return customers.get(customer.getKey());
-        }
-        return null;
+    private Customer getCustomer(CustomerID customer) {
+        return databaseClient.getCustomerById(customer);
     }
 
     private String createNewAccount(CustomerID customerID, String request) {
         String[] requestAndDetails = request.split(emptyString);
         if (requestAndDetails.length == 2) {
             String newAccountName = requestAndDetails[1];
-            customers.get(customerID.getKey()).addAccount(new Account(newAccountName, 0.0, 1234));
+            databaseClient.addAccount(customerID, new Account(newAccountName, 0.0, 1234));
             return Status.SUCCESS.toString();
         }
         return Status.FAIL.toString();
     }
 
     private String showMyAccounts(CustomerID customer) {
-        return (customers.get(customer.getKey())).accountsToString();
+        return databaseClient.getAccountsAsString(customer);
     }
 
     private String moveMoney(CustomerID customerID, String request) {
         //User input
         String[] parsedInput = parseString(request);
+
         if (parsedInput.length != 4) return Status.FAIL.toString();
 
         //customer
-        Customer customer = customers.get(customerID.getKey());
+        Customer customer = databaseClient.getCustomerById(customerID);
 
         //amount
         String userInputAmount = parsedInput[1];
@@ -142,13 +145,12 @@ public class NewBank {
         if (parsedInput.length != 4) return Status.FAIL.toString();
 
         //payer
-        Customer payer = customers.get(customerID.getKey());
+        Customer payer = databaseClient.getCustomerById(customerID);
         HashMap<String, Account> payerAccounts = payer.getHasMapForAllCustomerAccounts();
 
         //payee
         String payeeCustomerName = parsedInput[1];
-        Customer payee;
-        payee = customers.get(payeeCustomerName);
+        Customer payee = databaseClient.getCustomerById(payeeCustomerName);
         if (payee == null) return Status.FAIL.toString();
 
         HashMap<String, Account> payeeAccounts = payee.getHasMapForAllCustomerAccounts();
@@ -170,89 +172,100 @@ public class NewBank {
 
         //Calculate transaction
         paymentHelper.calculateTransaction(from, to, amount);
+        databaseClient.updateCustomer(payer);
+        databaseClient.updateCustomer(payee);
         return Status.SUCCESS.toString();
     }
-    
+
     private String updateCustomerEmail(CustomerID customer, String command, Map<Parameter, String> properties) {
-    	String newEmail = properties.get(Parameter.EMAIL);
-         if (InputValidator.isEmailAddressValid(newEmail)) {
-             customers.get(customer.getKey()).setEmail(newEmail); 
-             return Status.SUCCESS.toString();
-         }
-         return Status.FAIL.toString();
-	}
-    
+        String newEmail = properties.get(Parameter.EMAIL);
+        if (InputValidator.isEmailAddressValid(newEmail)) {
+            Customer theCustomer = databaseClient.getCustomerById(customer.getKey());
+            theCustomer.setEmail(newEmail);
+            databaseClient.updateCustomer(theCustomer);
+            return Status.SUCCESS.toString();
+        }
+        return Status.FAIL.toString();
+    }
+
     private String updateCustomerAddress(CustomerID customer, String command, Map<Parameter, String> properties) {
-    	String newAddress = properties.get(Parameter.ADDRESS);
-        
+        String newAddress = properties.get(Parameter.ADDRESS);
+
         if (InputValidator.validateTextLength(newAddress, 4, -1)) {
-        	customers.get(customer.getKey()).setAddress(newAddress); 
+            Customer theCustomer = databaseClient.getCustomerById(customer.getKey());
+            theCustomer.setAddress(newAddress);
+            databaseClient.updateCustomer(theCustomer);
             return Status.SUCCESS.toString();
         }
-            
+
         return Status.FAIL.toString();
-	}
-    
-    private String updateCustomerName(CustomerID customer, String command, Map<Parameter, String> properties){
-    	String newName = properties.get(Parameter.FIRSTNAME) + " " +  properties.get(Parameter.SURNAME);
-   
-    	if (InputValidator.validateTextLength(newName, 4, -1)) {
-            customers.get(customer.getKey()).setName(newName); 
+    }
+
+    private String updateCustomerName(CustomerID customer, String command, Map<Parameter, String> properties) {
+        String newName = properties.get(Parameter.FIRSTNAME) + " " + properties.get(Parameter.SURNAME);
+
+        if (InputValidator.validateTextLength(newName, 4, -1)) {
+            Customer theCustomer = databaseClient.getCustomerById(customer.getKey());
+            theCustomer.setName(newName);
+            databaseClient.updateCustomer(theCustomer);
             return Status.SUCCESS.toString();
         }
         return Status.FAIL.toString();
-	}
-    
+    }
+
     private String updateCustomerDob(CustomerID customer, String command, Map<Parameter, String> properties) {
-    	String dob = properties.get(Parameter.DOB);
-    	
-        if (InputValidator.parseDate(dob, "d MM yyyy")==null) return "FAIL: Invalid date format for Date of Birth" ;
-        
-		try {
-			SimpleDateFormat parser = new SimpleDateFormat("d MM yyyy");
-			
+        String dob = properties.get(Parameter.DOB);
+
+        if (InputValidator.parseDate(dob, "d MM yyyy") == null) return "FAIL: Invalid date format for Date of Birth";
+
+        try {
+            SimpleDateFormat parser = new SimpleDateFormat("d MM yyyy");
+
             Date d;
-			d = parser.parse(dob);
-			customers.get(customer.getKey()).setDob(d); 
+            d = parser.parse(dob);
+            Customer theCustomer = databaseClient.getCustomerById(customer.getKey());
+            theCustomer.setDob(d);
+            databaseClient.updateCustomer(theCustomer);
             return Status.SUCCESS.toString();
-            
-		} catch (ParseException e) {
-			return Status.FAIL.toString() + ": Date format error.";
-		}
-	}
-    
-    public String registerNewCustomer(Map<String,String> properties) {
-		String firstname = properties.get("firstname");
-		String surname = properties.get("surname");
-		String newPassword = properties.get("password1");
-		String confirmPassword = properties.get("password2");
-		String dob = properties.get("dob");
-		String email = properties.get("email");
-		String address = properties.get("address");
-		
-		if (InputValidator.parseDate(dob, "d MM yyyy")==null) return "FAIL: Invalid Date of Birth.";
-		if (!(newPassword.equals(confirmPassword))) return "FAIL: Password mismatch." + newPassword + " " + confirmPassword;
-		if (!InputValidator.isEmailAddressValid(email)) return "FAIL: Invalid email address.";
-		if (!InputValidator.validateTextLength(address,4, -1))return "FAIL: Invalid address length.";
-		
-		Customer customer = new Customer(firstname, surname);
-		
-		if (InputValidator.parseDate(dob, "d MM yyyy") == null )
-			return Status.SUCCESS.toString() + ": Invalid Date Format";
-		
-		customer.setDob(InputValidator.parseDate(dob, "d MM yyyy"));
-		customer.setEmail(email);
-		customer.setAddress(address);
-		
-		if ( !(customer.setPassword(confirmPassword)) ) {
-			return  Status.FAIL.toString() + ":Password Rejected";
-		}
-		
-		databaseClient.addNewCustomer(firstname, customer);
-		
-		return Status.SUCCESS.toString();
-	}
-    
+
+        } catch (ParseException e) {
+            return Status.FAIL.toString() + ": Date format error.";
+        }
+    }
+
+    public String registerNewCustomer(Map<String, String> properties) {
+        String firstname = properties.get("firstname");
+        String surname = properties.get("surname");
+        String newPassword = properties.get("password1");
+        String confirmPassword = properties.get("password2");
+        String dob = properties.get("dob");
+        String email = properties.get("email");
+        String address = properties.get("address");
+
+        if (InputValidator.parseDate(dob, "d MM yyyy") == null) return "FAIL: Invalid Date of Birth.";
+        if (!(newPassword.equals(confirmPassword)))
+            return "FAIL: Password mismatch." + newPassword + " " + confirmPassword;
+        if (!InputValidator.isEmailAddressValid(email)) return "FAIL: Invalid email address.";
+        if (!InputValidator.validateTextLength(address, 4, -1)) return "FAIL: Invalid address length.";
+
+        Customer customer = new Customer(firstname, surname);
+
+        if (InputValidator.parseDate(dob, "d MM yyyy") == null)
+            return Status.SUCCESS.toString() + ": Invalid Date Format";
+
+        customer.setDob(InputValidator.parseDate(dob, "d MM yyyy"));
+        customer.setEmail(email);
+        customer.setAddress(address);
+
+        if (!(customer.setPassword(confirmPassword))) {
+            return Status.FAIL.toString() + ":Password Rejected";
+        }
+
+        databaseClient.addNewCustomer(customer);
+
+        return Status.SUCCESS.toString();
+    }
+
     public boolean validUserAmount(final String s) {
         try {
             final double move = Double.parseDouble(s);
@@ -262,7 +275,12 @@ public class NewBank {
         }
         return false;
     }
+
     private String[] parseString(String inputString) {
         return inputString.split(emptyString);
+    }
+
+    public Customer getCustomerById(String customerID) {
+        return databaseClient.getCustomerById(customerID);
     }
 }
