@@ -1,7 +1,5 @@
 package newbank.database.static_data;
 
-import newbank.server.CustomerID;
-
 public abstract class NewBankData {
 
     //Transaction statuses
@@ -9,12 +7,25 @@ public abstract class NewBankData {
         SUCCESS,FAIL
     }
 
-    //Menu options
+    //Menu options for Main Menu
     public final static String showMyAccounts = "SHOWMYACCOUNTS";
     public final static String newAccount = "NEWACCOUNT";
     public final static String move = "MOVE";
     public final static String pay = "PAY";
     public final static String customerDetail = "CUSTOMERDETAIL";
+    public final static String updateCustomerDetail = "UPDATECUSTOMERDETAIL";
+    
+    //Menu options for Customer Details Menu
+    public final static String showCustomerName = "SHOWCUSTOMERNAME";
+    public final static String showCustomerEmail = "SHOWCUSTOMEREMAIL";
+    public final static String showCustomerAddress = "SHOWCUSTERADDRESS";
+    public final static String showCustomerDOB = "SHOWCUSTERDOB";
+    
+  //Commands literals
+    public final static String updateCustomerName = "UPDATECUSTOMERNAME";
+    public final static String updateCustomerEmail = "UPDATECUSTOMEREMAIL";
+    public final static String updateCustomerAddress = "UPDATECUSTERADDRESS";
+    public final static String updateCustomerDOB = "UPDATECUSTERDOB";
 
     //Menu Option IDs
     public final static String enumIdOne = "1";

@@ -1,22 +1,19 @@
 package newbank.server;
 
 import java.io.PrintWriter;
-
 import static newbank.database.static_data.NewBankData.*;
 
-public enum MainMenu {
-        ShowMyAccounts(enumIdOne, showMyAccounts),
-        NewAccount(enumIdTwo, newAccount),
-        Move(enumIdThree, move),
-        Pay(enumIdFour,pay),
-        CustomerDetails(enumIdFive, customerDetail),
-        UpdateCustomerDetails(enumIdSix, updateCustomerDetail),
+public enum UpdateCustomerDetailsMenu {
+        UpdateCustomerName(enumIdOne, updateCustomerName),
+        UpdateCustomerEmail(enumIdTwo, updateCustomerEmail),
+        UpdateCustomerAddress(enumIdThree, updateCustomerAddress),
+        UpdateCustomerDOB(enumIdFour, updateCustomerDOB),
         Quit(enumIdNine, quit);
 
         private final String menuOptionId;
         private final String menuOption;
 
-        MainMenu(String menuOptionId, String menuOption) {
+        UpdateCustomerDetailsMenu(String menuOptionId, String menuOption) {
             this.menuOptionId = menuOptionId;
             this.menuOption = menuOption;
         }
@@ -26,7 +23,7 @@ public enum MainMenu {
 
         public static void processMenuSelection(PrintWriter out) {
             // Print values
-            for (MainMenu key : MainMenu.values()) {
+            for (UpdateCustomerDetailsMenu key : UpdateCustomerDetailsMenu.values()) {
                 out.println(key.menuOptionId + ".\t" + key);
             }
         }

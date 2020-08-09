@@ -43,6 +43,13 @@ public class Customer {
 		this.customerID = customerID.getKey();
 	}
 
+	//Constructor 3
+	public Customer(String firstname, String surname) {
+    	this();
+        this.customerID = firstname;
+        this.name = firstname + " " + surname;
+	 }
+
 	public CustomerID getCustomerID() {
 		return new CustomerID(customerID);
 	}
@@ -150,7 +157,10 @@ public class Customer {
 	}
 
 	public boolean setPassword(String password) {
-		if (isValidPassword(password)) this.password = password;
+		if (isValidPassword(password)) {
+			this.password = password;
+			return true;
+		}
 
 		return false;
 	}

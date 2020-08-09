@@ -118,9 +118,9 @@
         <groupId>org.pitest</groupId>
         <artifactId>pitest-maven</artifactId>
         <configuration>
-          <!-- this is to ensure at least 22% of discovered scenarios are handled -->
+          <!-- this is to ensure at least 15% of discovered scenarios are handled -->
           <!-- TODO increase mutation threashold steadily over time to at least 50% -->
-          <mutationThreshold>22</mutationThreshold>
+          <mutationThreshold>15</mutationThreshold>
           <!-- pitest really does not like how this test runs -->
           <excludedTestClasses>
             <excludedTestClass>newbank.server.NewBankTest</excludedTestClass>

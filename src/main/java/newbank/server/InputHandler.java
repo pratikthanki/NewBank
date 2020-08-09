@@ -55,7 +55,6 @@ public class InputHandler {
 
         out.println(requestFrom + customerID.getKey());
 
-
         recipient = verifyCustomer(out, in , bank);
         amount = verifyAmount(out, in );
         Double dAmount = Double.valueOf(amount);
@@ -77,9 +76,110 @@ public class InputHandler {
         out.println(lineSeparator);
         out.println(done);
     }
+    
+    public void updateCustomerEmail(BufferedReader in, PrintWriter out, CustomerID customerID, NewBank bank) {
+    	HashMap<Parameter, String> properties = new HashMap<>();
+    	out.println("Retrieving customer detail...");
+        out.println("The old email address is: " + bank.processRequest(customerID, showCustomerEmail));
+        out.println("Please enter the new email address: ");
+        
+		try {
+			properties.put(Parameter.EMAIL, in.readLine());
+			out.println("Updating EMAIL ADDRESS...");
+	        out.println(bank.processRequest(customerID, updateCustomerEmail, properties));
+	        out.println("----------------------");
+	        out.println("Done.");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public void updateCustomerAddress(BufferedReader in, PrintWriter out, CustomerID customerID, NewBank bank) {
+    	HashMap<Parameter, String> properties = new HashMap<>();
+    	out.println("Retrieving customer detail...");
+        out.println("The old address is: " + bank.processRequest(customerID, showCustomerAddress));
+        out.println("Please enter the new ADDRESS: ");
+        
+		try {
+			properties.put(Parameter.ADDRESS, in.readLine());
+			out.println("Updating ADDRESS...");
+	        out.println(bank.processRequest(customerID, updateCustomerAddress, properties));
+	        out.println("----------------------");
+	        out.println("Done.");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+    }
+    private void updateCustomerDOB(BufferedReader in, PrintWriter out, CustomerID customerID, NewBank bank) {
+    	HashMap<Parameter, String> properties = new HashMap<>();
+		
+		try {
+			out.println("The current Date of Birth is : " + bank.processRequest(customerID, showCustomerDOB)) ;
+			
+			out.println("Enter Customer Date of Birth");
+			properties.put(Parameter.DOB, in.readLine());
+			
+			out.println(bank.processRequest(customerID, updateCustomerDOB, properties));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
 
+	private void updateCustomerName(BufferedReader in, PrintWriter out, CustomerID customerID, NewBank bank) {
+		HashMap<Parameter, String> properties = new HashMap<>();
+		
+		try {
+			out.println("The current name is : " + bank.processRequest(customerID, showCustomerName)) ;
+			
+			out.println("Enter Customer FIRSTNAME");
+			properties.put(Parameter.FIRSTNAME, in.readLine());
+			
+			out.println("Enter Customer SURNAME");
+			properties.put(Parameter.SURNAME, in.readLine());
+			
+			out.println(
+					bank.processRequest(customerID, updateCustomerName, properties));
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+	}
+    public void updateCustomerDetails(BufferedReader in, PrintWriter out, CustomerID customerID, NewBank bank) {
 
-    /*
+    	 String menuItem;
+    	 
+    	 UpdateCustomerDetailsMenu.processMenuSelection(out);
+    	 
+         out.println(selectOption);
+         try {
+			menuItem = in.readLine();
+			
+			switch (menuItem) {
+				case enumIdOne:
+	                this.updateCustomerName(in, out, customerID, bank);
+	                break;
+	            case enumIdTwo:
+	                this.updateCustomerEmail(in, out, customerID, bank);
+	                break;
+	            case enumIdThree:
+	                this.updateCustomerAddress(in, out, customerID, bank);
+	                break;
+	            case enumIdFour:
+	                this.updateCustomerDOB(in, out, customerID, bank);
+	                break;
+	            default:
+	            	out.println(invalidChoice);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+    }
+
+	/*
        Helper functions
     */
 
