@@ -53,7 +53,7 @@ public class SavingsTest {
         Customer customer = new Customer(new CustomerID("John"));
         customer.addAccount(savings);
         customer.addAccount(checking);
-        checking.setDefaultAccount(customer);
+        customer.setDefaultAccount(checking);
 
         LocalDateTime localDateTime = LocalDateTime.now().plusMonths(1);
 

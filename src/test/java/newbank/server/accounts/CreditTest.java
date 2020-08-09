@@ -88,4 +88,23 @@ public class CreditTest {
         assertEquals(100, credit.getBalance(), 0.1);
 
     }
+
+    @Test
+    public void payOffFullDebtCreditCardBalance() throws InsufficientFundsException {
+        credit = new Credit("Credit Card", 100.0, 1234, 1.15);
+        Account checking = new Account("Checking", 123, 1234);
+
+        credit.purchaseOnCredit(10);
+
+        assertEquals(90, credit.getBalance(), 0.1);
+
+        Customer customer = new Customer(new CustomerID("John"));
+        customer.addAccount(credit);
+        customer.addAccount(checking);
+        customer.setDefaultAccount(checking);
+
+        credit.payOffFullDebtFromDefaultAccount(customer);
+
+        assertEquals(100, credit.getBalance(), 0.1);
+    }
 }

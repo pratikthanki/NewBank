@@ -22,13 +22,10 @@ public class Account {
         this.accountName = accountName;
     }
 
+    public void setDefaultAccountStatus(){ this.defaultAccountStatus = true; }
+
     public Boolean isDefaultAccount() {
         return defaultAccountStatus;
-    }
-
-    public void setDefaultAccount(Customer customer) {
-        int count = customer.getNumberOfAccounts();
-        defaultAccountStatus = count <= 1;
     }
 
     public void addMoney(double money) {

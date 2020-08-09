@@ -49,7 +49,10 @@ public class Customer {
 
 	public void addAccount(Account account) {
 		accounts.add(account);
-		account.setDefaultAccount(this);
+	}
+
+	public void setDefaultAccount(Account account){
+		account.setDefaultAccountStatus();
 	}
 
 	//get number of default accounts
