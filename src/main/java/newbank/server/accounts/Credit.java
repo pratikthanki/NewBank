@@ -51,6 +51,13 @@ public class Credit extends Account {
         }
     }
 
+    public void payOffFullDebtFromDefaultAccount(Customer customer){
+        Account account = customer.getDefaultAccount();
+        Double amountToPay = creditLimit - getBalance();
+        account.withdrawMoney(amountToPay);
+        addMoney(amountToPay);
+    }
+
     public double getInterestRate() {
         return interestRate;
     }

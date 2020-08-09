@@ -71,7 +71,7 @@ public class CreditTest {
     }
 
     @Test
-    public void payOffCredidCardBalance() throws InsufficientFundsException {
+    public void payOffCreditCardBalance() throws InsufficientFundsException {
         credit = new Credit("Credit Card", 100.0, 1234, 1.15);
         Account checking = new Account("Checking", 123, 1234);
 
@@ -82,7 +82,6 @@ public class CreditTest {
         Customer customer = new Customer(new CustomerID("John"));
         customer.addAccount(credit);
         customer.addAccount(checking);
-        checking.setDefaultAccount(customer);
 
         credit.payOffCreditCardBalance(customer, checking, 10.0);
 

@@ -1,7 +1,7 @@
 package newbank.server;
 
 public enum Parameter {
-	ACCOUNT_NUMMBER,
+	ACCOUNT_NUMBER,
 	ACCOUNT_NAME,
 	USERNAME,
 	PASSWORD,
