@@ -8,6 +8,8 @@
 NewBank is an idea for a new disrupter bank where customers can interact with their accounts via a simple 
 command-line interface.
 
+Have a look at our [wiki](https://github.com/pratikthanki/NewBank/wiki/) page for our sprint retros, and weekly meetings.
+
 
 **Goals**
 
